@@ -1,2 +1,2 @@
 # Text Case Changer
-Change the case of selected text in webpage input.
+Context menu to change case of selected entry text.
