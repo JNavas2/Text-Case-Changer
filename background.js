@@ -7,8 +7,7 @@
 browser.contextMenus.create({
   id: "text-case-changer",
   title: "Text Case Changer",
-  contexts: ["selection"],
-  documentUrlPatterns: ["<all_urls>"]
+  contexts: ["selection", "editable"],
 });
 
 // Submenu items: case functions
@@ -29,7 +28,7 @@ cases.forEach(item => {
     id: `text-case-changer-${item.id}`,
     parentId: "text-case-changer",
     title: item.title,
-    contexts: ["selection"]
+    contexts: ["selection", "editable"]
   });
 });
 

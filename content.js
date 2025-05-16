@@ -35,7 +35,7 @@ function isAllUpperCase(word) {
  */
 function parseText(text) {
   // Unicode regex: matches words including possessives (e.g., John's, niños', l'été)
-  const wordRegex = /[\p{L}]+(?:'[\p{L}]+)?/gu;
+  const wordRegex = /[\p{L}]+(?:'[\p{L}]+)*/gu;
   const words = text.match(wordRegex) || [];
   // Split by words to get all separators, including empty strings
   const separators = text.split(wordRegex);
@@ -63,20 +63,6 @@ function reassembleText({ words, separators }) {
 // SIMPLE CASE CONVERSION FUNCTIONS //////////////////////////////////////////////////////////////////////
 
 /**
- * Converts all words in the text to uppercase, unless the word is already all uppercase.
- * @param {string} text
- * @returns {string}
- */
-function upperCase(text) {
-  const parsed = parseText(text);
-  const words = parsed.words.map(word =>
-    isAllUpperCase(word) ? word : word.toUpperCase()
-  );
-  const changed = { words, separators: parsed.separators };
-  return reassembleText(changed);
-}
-
-/**
  * Converts all words in the text to lowercase, unless the word is already all uppercase.
  * @param {string} text
  * @returns {string}
@@ -89,6 +75,22 @@ function lowerCase(text) {
   const changed = { words, separators: parsed.separators };
   return reassembleText(changed);
 }
+
+/**
+ * Converts all words in the text to uppercase, unless the word is already all uppercase.
+ * @param {string} text
+ * @returns {string}
+ */
+function upperCase(text) {
+  console.log("UPPERCASE: ", text); // DEBUG //
+  const parsed = parseText(text);
+  const words = parsed.words.map(word =>
+    isAllUpperCase(word) ? word : word.toUpperCase()
+  );
+  const changed = { words, separators: parsed.separators };
+  return reassembleText(changed);
+}
+
 /**
  * Inverts the case of each letter in every word of the input text,
  * unless the word is all uppercase. Returns the changed text.
@@ -119,6 +121,32 @@ function invertCase(text) {
   return changedText;
 }
 /**
+ * Converts a string to sentence case:
+ *   - Capitalizes only the first word (unless it's all uppercase), lowercases others (unless all uppercase).
+ * @param {string} text - The input text string.
+ * @returns {string} - The sentence-cased string.
+ */
+function sentenceCase(text) {
+  // Parse the text into words and separators
+  const parsedObject = parseText(text);
+
+  // Change case
+  const words = parsedObject.words.map((word, idx) => {
+    if (isAllUpperCase(word)) return word;
+    if (idx === 0) {
+      // Capitalize first letter, lowercase the rest
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+    // Lowercase all other words
+    return word.toLowerCase();
+  });
+
+  // Reassemble text from the changed words and original separators
+  const changedObject = { words, separators: parsedObject.separators };
+  return reassembleText(changedObject);
+}
+
+/**
  * Converts the first character of each word to uppercase and the rest to lowercase,
  * unless the word is already all uppercase. Accepts a text string, parses it,
  * applies the logic, and returns the changed text.
@@ -143,32 +171,6 @@ function startCase(text) {
   };
 
   // Reassemble and return the changed text
-  return reassembleText(changedObject);
-}
-
-/**
- * Converts a string to sentence case:
- *   - Capitalizes only the first word (unless it's all uppercase), lowercases others (unless all uppercase).
- * @param {string} text - The input text string.
- * @returns {string} - The sentence-cased string.
- */
-function sentenceCase(text) {
-  // Parse the text into words and separators
-  const parsedObject = parseText(text);
-
-  // Change case
-  const words = parsedObject.words.map((word, idx) => {
-    if (isAllUpperCase(word)) return word;
-    if (idx === 0) {
-      // Capitalize first letter, lowercase the rest
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    }
-    // Lowercase all other words
-    return word.toLowerCase();
-  });
-
-  // Reassemble text from the changed words and original separators
-  const changedObject = { words, separators: parsedObject.separators };
   return reassembleText(changedObject);
 }
 
@@ -285,19 +287,34 @@ function snakeCase(text) {
 
 // MESSAGING FROM BACKGROUND.JS TO SELECT FUNCTION ///////////////////////////////////////////////////
 
+const caseFunctions = {
+  lowerCase,
+  upperCase,
+  invertCase,
+  sentenceCase,
+  startCase,
+  titleCase,
+  camelCase,
+  snakeCase
+};
+
 // Listen for messages from background.js
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "changeCase") {
-    const fn = window[message.caseType];
-    if (typeof fn !== "function") return;
-
+    const fn = caseFunctions[message.caseType];
+    if (typeof fn !== "function") {
+      console.error("Unknown case type:", message.caseType);
+    return;
+    }
     const active = document.activeElement;
     if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
       const start = active.selectionStart;
       const end = active.selectionEnd;
       if (start !== end) {
         let selected = active.value.substring(start, end);
+        console.log("BEFORE: ", selected); // DEBUG //
         selected = fn(selected);
+        console.log("AFTER:  ", selected); // DEBUG //
         active.setRangeText(selected, start, end, "end");
       }
     } else if (active && active.isContentEditable) {
@@ -317,40 +334,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sel.addRange(newRange);
         }
       }
+    } else { 
+      console.log("NO MATCH"); // DEBUG //
     }
   }
 });
-
-// TEST HARNESS for case functions //////////////////////////////////////////////////////
-
-const testCases = [
-  "hello world",
-  "HELLO WORLD",
-  "John's book",
-  "the quick brown fox jumps over the lazy dog",
-  "aN eXample OF mIXed CASE",
-  "to be or not to be",
-  "NASA and the FBI",
-  "l'été à Paris",
-  "snake_case test",
-  "camelCaseTest"
-];
-
-const functions = [
-  "upperCase",
-  "lowerCase",
-  "invertCase",
-  "startCase",
-  "sentenceCase",
-  "titleCase",
-  "camelCase",
-  "snakeCase"
-];
-
-for (const fnName of functions) {
-  console.log(`\n=== ${fnName} ===`);
-  for (const input of testCases) {
-    const output = window[fnName](input);
-    console.log(`"${input}" => "${output}"`);
-  }
-}
