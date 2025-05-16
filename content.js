@@ -1,11 +1,9 @@
-// Get the current selection as text
-let text = getSelection();
-let parsedObject = parseText(text);
-parsedObject = startCase(parsedObject);
-text = reassembleText(parsedObject);
-putSelection(text);
+/**
+ * CONTEXT.JS of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
+ * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
+ */
 
-// CONSTANTS
+// CONSTANTS /////////////////////////////////////////////////////////////////////////////////////
 
 // Common articles, conjunctions, prepositions ≤3 letters
 const minorWords = new Set([
@@ -14,7 +12,7 @@ const minorWords = new Set([
   "as", "at", "by", "in", "of", "off", "on", "per", "to", "up", "via" // prepositions
 ]);
 
-// HELPER FUNCTIONS
+// HELPER FUNCTIONS /////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Checks if a word is all uppercase (ignores non-letter characters).
@@ -28,47 +26,80 @@ function isAllUpperCase(word) {
   return letters.join('') === letters.join('').toUpperCase();
 }
 
-// SIMPLE CASE CONVERSION FUNCTIONS
+// FUNCTIONS TO PARSE AND REASSEMBLE TEXT ////////////////////////////////////////////////////////////
 
 /**
- * Capitalizes only the first word (unless it's all uppercase), lowercases others (unless all uppercase).
- * @param {{words: string[], separators: string[]}} parsedObject
+ * Parses the input text into words and separators.
+ * @param {string} text - The text to parse.
  * @returns {{words: string[], separators: string[]}}
  */
-function sentenceCase(parsedObject) {
-  const words = parsedObject.words.map((word, idx) => {
-    if (isAllUpperCase(word)) return word;
-    if (idx === 0) {
-      // Capitalize first letter, lowercase the rest
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    }
-    // Lowercase all other words
-    return word.toLowerCase();
-  });
-  return { words, separators: parsedObject.separators };
+function parseText(text) {
+  // Unicode regex: matches words including possessives (e.g., John's, niños', l'été)
+  const wordRegex = /[\p{L}]+(?:'[\p{L}]+)?/gu;
+  const words = text.match(wordRegex) || [];
+  // Split by words to get all separators, including empty strings
+  const separators = text.split(wordRegex);
+  return {
+    words,
+    separators,
+  };
 }
 
 /**
- * Converts the first character of each word to uppercase and the rest to lowercase,
- * unless the word is already all uppercase.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * Reassembles text from words and separators arrays.
+ * @param {{words: string[], separators: string[]}} param0
+ * @returns {string}
  */
-function startCase(parsedObject) {
-  const words = parsedObject.words.map(word =>
-    isAllUpperCase(word)
-      ? word
-      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+function reassembleText({ words, separators }) {
+  let result = '';
+  const maxLen = Math.max(words.length, separators.length);
+  for (let i = 0; i < maxLen; i += 1) {
+    if (separators[i] !== undefined) result += separators[i];
+    if (words[i] !== undefined) result += words[i];
+  }
+  return result;
+}
+
+// SIMPLE CASE CONVERSION FUNCTIONS //////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts all words in the text to uppercase, unless the word is already all uppercase.
+ * @param {string} text
+ * @returns {string}
+ */
+function upperCase(text) {
+  const parsed = parseText(text);
+  const words = parsed.words.map(word =>
+    isAllUpperCase(word) ? word : word.toUpperCase()
   );
-  return { words, separators: parsedObject.separators };
+  const changed = { words, separators: parsed.separators };
+  return reassembleText(changed);
 }
 
 /**
- * Inverts the case of each letter in every word, unless the word is all uppercase.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * Converts all words in the text to lowercase, unless the word is already all uppercase.
+ * @param {string} text
+ * @returns {string}
  */
-function invertCase(parsedObject) {
+function lowerCase(text) {
+  const parsed = parseText(text);
+  const words = parsed.words.map(word =>
+    isAllUpperCase(word) ? word : word.toLowerCase()
+  );
+  const changed = { words, separators: parsed.separators };
+  return reassembleText(changed);
+}
+/**
+ * Inverts the case of each letter in every word of the input text,
+ * unless the word is all uppercase. Returns the changed text.
+ * @param {string} text
+ * @returns {string}
+ */
+function invertCase(text) {
+  // Parse the input text
+  const parsedObject = parseText(text);
+
+  // Invert the case of each word (unless all uppercase)
   const words = parsedObject.words.map(word =>
     isAllUpperCase(word)
       ? word
@@ -78,45 +109,84 @@ function invertCase(parsedObject) {
             : char.toUpperCase()
         ).join('')
   );
-  return { words, separators: parsedObject.separators };
-}
 
+  // Reassemble the text with inverted words and original separators
+  const changedText = reassembleText({
+    words,
+    separators: parsedObject.separators
+  });
+
+  return changedText;
+}
 /**
- * Converts all words to uppercase, unless the word is already all uppercase.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * Converts the first character of each word to uppercase and the rest to lowercase,
+ * unless the word is already all uppercase. Accepts a text string, parses it,
+ * applies the logic, and returns the changed text.
+ * @param {string} text
+ * @returns {string}
  */
-function upperCase(parsedObject) {
-  const words = parsedObject.words.map(word =>
-    isAllUpperCase(word) ? word : word.toUpperCase()
+function startCase(text) {
+  // Parse the input text into words and separators
+  const parsedObject = parseText(text);
+
+  // Change the case
+  const changedWords = parsedObject.words.map(word =>
+    isAllUpperCase(word)
+      ? word
+      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   );
-  return { words, separators: parsedObject.separators };
+
+  // Create new parsed object with changed words
+  const changedObject = {
+    words: changedWords,
+    separators: parsedObject.separators
+  };
+
+  // Reassemble and return the changed text
+  return reassembleText(changedObject);
 }
 
 /**
- * Converts all words to lowercase, unless the word is already all uppercase.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * Converts a string to sentence case:
+ *   - Capitalizes only the first word (unless it's all uppercase), lowercases others (unless all uppercase).
+ * @param {string} text - The input text string.
+ * @returns {string} - The sentence-cased string.
  */
-function lowerCase(parsedObject) {
-  const words = parsedObject.words.map(word =>
-    isAllUpperCase(word) ? word : word.toLowerCase()
-  );
-  return { words, separators: parsedObject.separators };
+function sentenceCase(text) {
+  // Parse the text into words and separators
+  const parsedObject = parseText(text);
+
+  // Change case
+  const words = parsedObject.words.map((word, idx) => {
+    if (isAllUpperCase(word)) return word;
+    if (idx === 0) {
+      // Capitalize first letter, lowercase the rest
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+    // Lowercase all other words
+    return word.toLowerCase();
+  });
+
+  // Reassemble text from the changed words and original separators
+  const changedObject = { words, separators: parsedObject.separators };
+  return reassembleText(changedObject);
 }
 
-// TITLE CASE CONVERSION
+// TITLE CASE CONVERSION /////////////////////////////////////////////////////////////////////////////
 
 /**
- * Title case conversion following specific rules.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * Converts a text string to title case following specific rules.
+ * @param {string} text - The text to convert.
+ * @returns {string} - The title-cased text.
  */
-function titleCase(parsedObject) {
+function titleCase(text) {
+  // Step 1: Parse the text into words and separators
+  const parsedObject = parseText(text);
   const { words } = parsedObject;
   const len = words.length;
   const result = [];
 
+  // Step 2: Apply title case logic to each word
   for (let i = 0; i < len; i++) {
     let word = words[i];
     if (isAllUpperCase(word)) {
@@ -154,20 +224,22 @@ function titleCase(parsedObject) {
     result.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
   }
 
-  return { words: result, separators: parsedObject.separators };
+  // Step 3: Reassemble and return the changed text
+  return reassembleText({ words: result, separators: parsedObject.separators });
 }
 
-// CAMELCASE CONVERSION
+// CAMELCASE CONVERSION //////////////////////////////////////////////////////////////////////////////
 
 /**
- * Converts text to camelCase.
+ * Converts a text string to camelCase.
  * - First word is lowercased unless all uppercase.
  * - Subsequent words are capitalized unless all uppercase.
- * @param {{words: string[], separators: string[]}} parsedObject
- * @returns {{words: string[], separators: string[]}}
+ * @param {string} text
+ * @returns {string}
  */
-function camelCase(parsedObject) {
-  const words = parsedObject.words.map((word, idx) => {
+function camelCase(text) {
+  const parsed = parseText(text);
+  const words = parsed.words.map((word, idx) => {
     if (isAllUpperCase(word)) return word;
     if (idx === 0) {
       // Lowercase the first word
@@ -176,51 +248,75 @@ function camelCase(parsedObject) {
     // Capitalize first letter, lowercase the rest
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   });
-  return { words, separators: parsedObject.separators };
+  // Reassemble with no separators (empty array of separators)
+  return reassembleText({ words, separators: Array(words.length + 1).fill('') });
 }
 
-// FUNCTIONS TO PARSE AND REASSEMBLE TEXT
+// SNAKE CASE CONVERSION & REASSEMBLY ////////////////////////////////////////////////////////////////
 
 /**
- * Parses the input text into words and separators.
- * @param {string} text - The text to parse.
- * @returns {{words: string[], separators: string[]}}
- */
-function parseText(text) {
-  // Unicode regex: matches words including possessives (e.g., John's, niños', l'été)
-  const wordRegex = /[\p{L}]+(?:'[\p{L}]+)?/gu;
-  const words = text.match(wordRegex) || [];
-  // Split by words to get all separators, including empty strings
-  const separators = text.split(wordRegex);
-  return {
-    words,
-    separators,
-  };
-}
-
-/**
- * Reassembles text from words and separators arrays.
- * @param {{words: string[], separators: string[]}} param0
+ * Converts input text to snake_case using parseText and reassembleText logic.
+ * @param {string} text
  * @returns {string}
  */
-function reassembleText({ words, separators }) {
-  let result = '';
-  const maxLen = Math.max(words.length, separators.length);
-  for (let i = 0; i < maxLen; i += 1) {
-    if (separators[i] !== undefined) result += separators[i];
-    if (words[i] !== undefined) result += words[i];
+function snakeCase(text) {
+  // Parse the text into words and separators
+  const parsed = parseText(text);
+
+  // Lowercase all words (snake_case logic)
+  parsed.words = parsed.words.map(word => word.toLowerCase());
+
+  // Replace all separators with underscores
+  // (One less separator than words, so fill the rest with '')
+  parsed.separators = parsed.separators.map(() => '_');
+  // If separators array is shorter than words, pad it
+  while (parsed.separators.length < parsed.words.length) {
+    parsed.separators.push('_');
   }
-  return result;
+
+  // Remove leading and trailing underscores (if any)
+  // (Optional: depends on your requirements. If you want to keep them, remove this part.)
+  if (parsed.separators[0] === '_') parsed.separators[0] = '';
+  if (parsed.separators[parsed.separators.length - 1] === '_') parsed.separators[parsed.separators.length - 1] = '';
+
+  // Reassemble the text with underscores as separators
+  return reassembleText(parsed);
 }
 
-// SNAKE CASE CONVERSION & REASSEMBLY
+// MESSAGING FROM BACKGROUND.JS TO SELECT FUNCTION ///////////////////////////////////////////////////
 
-/**
- * Reassembles words into snake_case (all lowercase, joined by underscores).
- * Ignores original separators.
- * @param {{words: string[], separators: string[]}} param0
- * @returns {string}
- */
-function reassembleSnake({ words }) {
-  return words.map(word => word.toLowerCase()).join('_');
-}
+// Listen for messages from background.js
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "changeCase") {
+    const fn = window[message.caseType];
+    if (typeof fn !== "function") return;
+
+    const active = document.activeElement;
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
+      const start = active.selectionStart;
+      const end = active.selectionEnd;
+      if (start !== end) {
+        let selected = active.value.substring(start, end);
+        selected = fn(selected);
+        active.setRangeText(selected, start, end, "end");
+      }
+    } else if (active && active.isContentEditable) {
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (!range.collapsed && active.contains(range.commonAncestorContainer)) {
+          let selected = sel.toString();
+          const newText = fn(selected);
+          range.deleteContents();
+          const textNode = document.createTextNode(newText);
+          range.insertNode(textNode);
+          sel.removeAllRanges();
+          const newRange = document.createRange();
+          newRange.setStartBefore(textNode);
+          newRange.setEndAfter(textNode);
+          sel.addRange(newRange);
+        }
+      }
+    }
+  }
+});
