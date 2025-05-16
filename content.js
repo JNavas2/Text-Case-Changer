@@ -320,3 +320,37 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 });
+
+// TEST HARNESS for case functions //////////////////////////////////////////////////////
+
+const testCases = [
+  "hello world",
+  "HELLO WORLD",
+  "John's book",
+  "the quick brown fox jumps over the lazy dog",
+  "aN eXample OF mIXed CASE",
+  "to be or not to be",
+  "NASA and the FBI",
+  "l'été à Paris",
+  "snake_case test",
+  "camelCaseTest"
+];
+
+const functions = [
+  "upperCase",
+  "lowerCase",
+  "invertCase",
+  "startCase",
+  "sentenceCase",
+  "titleCase",
+  "camelCase",
+  "snakeCase"
+];
+
+for (const fnName of functions) {
+  console.log(`\n=== ${fnName} ===`);
+  for (const input of testCases) {
+    const output = window[fnName](input);
+    console.log(`"${input}" => "${output}"`);
+  }
+}

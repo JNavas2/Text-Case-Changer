@@ -11,7 +11,7 @@ browser.contextMenus.create({
   documentUrlPatterns: ["<all_urls>"]
 });
 
-// Submenu items
+// Submenu items: case functions
 const cases = [
   { id: "lowerCase", title: "lower Case" },
   { id: "upperCase", title: "UPPER Case" },
