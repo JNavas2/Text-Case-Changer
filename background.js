@@ -21,8 +21,8 @@ browser.contextMenus.create({
 
 // Submenu items: case functions
 const cases = [
-  { id: "lowerCase",    title: "lower case" },
-  { id: "upperCase",    title: "UPPER CASE" },
+  { id: "lowerCase",    title: "lower case",    icon: "images/lowercase-16.png" },
+  { id: "upperCase",    title: "UPPER CASE",    icon: "images/uppercase-16.png" },
   { id: "invertCase",   title: "Invert cASE" },
   { id: "sentenceCase", title: "Sentence Case" },
   { id: "startCase",    title: "Start Case" },
