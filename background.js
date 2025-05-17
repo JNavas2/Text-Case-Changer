@@ -33,12 +33,17 @@ const cases = [
 
 // Create submenu items
 cases.forEach(item => {
-  browser.contextMenus.create({
+  const menuItem = {
     id: `text-case-changer-${item.id}`,
     parentId: "text-case-changer",
     title: item.title,
     contexts: ["selection", "editable"]
-  });
+  };
+  // Add icon if specified
+  if (item.icon) {
+    menuItem.icons = { "16": item.icon };
+  }
+  browser.contextMenus.create(menuItem);
 });
 
 // Handle menu clicks
