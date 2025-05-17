@@ -3,6 +3,15 @@
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
+// Onboarding/Upboarding welcome with Remove button
+browser.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "install" || details.reason === "update") {
+    browser.tabs.create({
+      url: browser.runtime.getURL("onboarding.html")
+    });
+  }
+});
+
 // Create the parent context menu for editable selections
 browser.contextMenus.create({
   id: "text-case-changer",
@@ -12,14 +21,14 @@ browser.contextMenus.create({
 
 // Submenu items: case functions
 const cases = [
-  { id: "lowerCase", title: "lower Case" },
-  { id: "upperCase", title: "UPPER Case" },
-  { id: "invertCase", title: "Invert Case" },
+  { id: "lowerCase",    title: "lower case" },
+  { id: "upperCase",    title: "UPPER CASE" },
+  { id: "invertCase",   title: "Invert cASE" },
   { id: "sentenceCase", title: "Sentence Case" },
-  { id: "startCase", title: "Start Case" },
-  { id: "titleCase", title: "Title Case" },
-  { id: "camelCase", title: "camelCase" },
-  { id: "snakeCase", title: "snake_case" }
+  { id: "startCase",    title: "Start Case" },
+  { id: "titleCase",    title: "Title Case" },
+  { id: "camelCase",    title: "camelCase" },
+  { id: "snakeCase",    title: "snake_case" }
 ];
 
 // Create submenu items

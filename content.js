@@ -82,7 +82,6 @@ function lowerCase(text) {
  * @returns {string}
  */
 function upperCase(text) {
-  console.log("UPPERCASE: ", text); // DEBUG //
   const parsed = parseText(text);
   const words = parsed.words.map(word =>
     isAllUpperCase(word) ? word : word.toUpperCase()
@@ -312,9 +311,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const end = active.selectionEnd;
       if (start !== end) {
         let selected = active.value.substring(start, end);
-        console.log("BEFORE: ", selected); // DEBUG //
         selected = fn(selected);
-        console.log("AFTER:  ", selected); // DEBUG //
         active.setRangeText(selected, start, end, "end");
       }
     } else if (active && active.isContentEditable) {
@@ -334,8 +331,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sel.addRange(newRange);
         }
       }
-    } else { 
-      console.log("NO MATCH"); // DEBUG //
     }
   }
 });
