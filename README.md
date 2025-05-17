@@ -6,7 +6,7 @@ and then invoke a context menu to choose the desired case:
 * Invert cASE 
 * Sentence case 
 * Start Case 
-* Title Case 
+* Title Case (AP style)
 * camelCase 
 * snake_case
 
