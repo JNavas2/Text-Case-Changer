@@ -10,4 +10,5 @@ and then invoke a context menu to choose the desired case:
 * camelCase 
 * snake_case
 
+NOTE: Words in all caps (e.g., NASA) are not changed.\
 PRIVACY: This extension does <b>not</b> collect user information.
