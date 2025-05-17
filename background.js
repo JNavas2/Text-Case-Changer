@@ -23,12 +23,12 @@ browser.contextMenus.create({
 const cases = [
   { id: "lowerCase",    title: "lower case",    icon: "images/lowercase-16.png" },
   { id: "upperCase",    title: "UPPER CASE",    icon: "images/uppercase-16.png" },
-  { id: "invertCase",   title: "Invert cASE" },
-  { id: "sentenceCase", title: "Sentence Case" },
-  { id: "startCase",    title: "Start Case" },
-  { id: "titleCase",    title: "Title Case" },
-  { id: "camelCase",    title: "camelCase" },
-  { id: "snakeCase",    title: "snake_case" }
+  { id: "invertCase",   title: "Invert cASE",   icon: "images/invertcase-16.png" },
+  { id: "sentenceCase", title: "Sentence Case", icon: "images/sentencecase-16.png" },
+  { id: "startCase",    title: "Start Case",    icon: "images/startcase-16.png" },
+  { id: "titleCase",    title: "Title Case",    icon: "images/titlecase-16.png" },
+  { id: "camelCase",    title: "camelCase",     icon: "images/camelcase-16.png" },
+  { id: "snakeCase",    title: "snake_case",    icon: "images/snakecase-16.png" },
 ];
 
 // Create submenu items
