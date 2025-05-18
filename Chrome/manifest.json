@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Text Case Changer",
   "version": "0.9.1",
-  "description": "Change Case of selected editable text by context menu.",
+  "description": "Change Case of selected editable text.",
   "icons": {
     "32": "images/icon-32.png",
     "48": "images/icon-48.png",
@@ -26,5 +26,35 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "commands": {
+    "lowerCase": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Convert selection to lower case"
+    },
+    "upperCase": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Convert selection to upper case"
+    },
+    "sentenceCase": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Convert selection to sentence case"
+    },
+    "titleCase": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Convert selection to title/headline case"
+    }
+  }
 }

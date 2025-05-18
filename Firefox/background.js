@@ -3,6 +3,39 @@
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
+// Helper function to create context menus
+function createContextMenus() {
+  // Create the parent context menu for editable selections
+  browser.contextMenus.create({
+    id: "text-case-changer",
+    title: "Text Case Changer",
+    contexts: ["selection", "editable"],
+  });
+
+  // Submenu items: case functions with shortcuts in titles
+  const cases = [
+    { id: "lowerCase",    title: "lower case",     icon: "images/lowercase-16.png" },
+    { id: "upperCase",    title: "UPPER CASE",     icon: "images/uppercase-16.png" },
+    { id: "invertCase",   title: "Invert cASE",    icon: "images/invertcase-16.png" },
+    { id: "sentenceCase", title: "Sentence Case.", icon: "images/sentencecase-16.png" },
+    { id: "startCase",    title: "Start Case",     icon: "images/startcase-16.png" },
+    { id: "titleCase",    title: "Title Case",     icon: "images/titlecase-16.png" },
+    { id: "camelCase",    title: "camelCase",      icon: "images/camelcase-16.png" },
+    { id: "snakeCase",    title: "snake_case",     icon: "images/snakecase-16.png" },
+  ];
+
+  // Create submenu items with icons and updated titles
+  cases.forEach(item => {
+    browser.contextMenus.create({
+      id: `text-case-changer-${item.id}`,
+      parentId: "text-case-changer",
+      title: item.title,
+      contexts: ["selection", "editable"],
+      icons: { "16": item.icon }
+    });
+  });
+}
+
 // Onboarding/Upboarding welcome with Remove button
 browser.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install" || details.reason === "update") {
@@ -10,36 +43,13 @@ browser.runtime.onInstalled.addListener((details) => {
       url: browser.runtime.getURL("onboarding.html")
     });
   }
+  // Always clear and recreate context menus on install/update
+  browser.contextMenus.removeAll().then(createContextMenus);
 });
 
-// Create the parent context menu for editable selections
-browser.contextMenus.create({
-  id: "text-case-changer",
-  title: "Text Case Changer",
-  contexts: ["selection", "editable"],
-});
-
-// Submenu items: case functions with shortcuts in titles
-const cases = [
-  { id: "lowerCase",    title: "lower case (Ctrl+Shift+L)",    icon: "images/lowercase-16.png" },
-  { id: "upperCase",    title: "UPPER CASE (Ctrl+Shift+U)",    icon: "images/uppercase-16.png" },
-  { id: "invertCase",   title: "Invert cASE (Ctrl+Shift+2)",   icon: "images/invertcase-16.png" },
-  { id: "sentenceCase", title: "Sentence Case (Ctrl+Shift+3)", icon: "images/sentencecase-16.png" },
-  { id: "startCase",    title: "Start Case (Ctrl+Shift+4)",    icon: "images/startcase-16.png" },
-  { id: "titleCase",    title: "Title Case (Ctrl+Shift+H)",    icon: "images/titlecase-16.png" },
-  { id: "camelCase",    title: "camelCase (Ctrl+Shift+Y)",     icon: "images/camelcase-16.png" },
-  { id: "snakeCase",    title: "snake_case (Ctrl+Shift+X)",    icon: "images/snakecase-16.png" },
-];
-
-// Create submenu items with icons and updated titles
-cases.forEach(item => {
-  browser.contextMenus.create({
-    id: `text-case-changer-${item.id}`,
-    parentId: "text-case-changer",
-    title: item.title,
-    contexts: ["selection", "editable"],
-    icons: { "16": item.icon }
-  });
+// Also clear and recreate context menus at startup (for extension reloads)
+browser.runtime.onStartup.addListener(() => {
+  browser.contextMenus.removeAll().then(createContextMenus);
 });
 
 // Handle context menu clicks
@@ -51,21 +61,33 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
       browser.tabs.sendMessage(tab.id, {
         action: "changeCase",
         caseType: caseType
+      }).catch(e => {
+        // Log error if content script is not available
+        console.error("Failed to send message to content script:", e);
       });
     }
   }
 });
 
-// Handle keyboard shortcut commands
+// Handle extension commands (keyboard shortcuts)
 browser.commands.onCommand.addListener((command) => {
-  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-    if (tabs.length > 0 && tabs[0].id) {
-      browser.tabs.sendMessage(tabs[0].id, {
-        action: "changeCase",
-        caseType: command
-      });
-    }
-  }).catch((error) => {
-    console.error("Error sending command message:", error);
-  });
+  // Only handle valid case commands
+  const validCases = [
+    "lowerCase", "upperCase", "invertCase", "sentenceCase",
+    "startCase", "titleCase", "camelCase", "snakeCase"
+  ];
+  if (validCases.includes(command)) {
+    // Get the active tab in the current window
+    browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+      if (tabs[0] && tabs[0].id) {
+        browser.tabs.sendMessage(tabs[0].id, {
+          action: "changeCase",
+          caseType: command
+        }).catch(e => {
+          // Log error if content script is not available
+          console.error("Failed to send message to content script:", e);
+        });
+      }
+    });
+  }
 });

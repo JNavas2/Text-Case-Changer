@@ -1,5 +1,5 @@
 /**
- * BACKGROUND.JS of TEXT CASE CHANGER, an EXTENSION for CHROME MANIFEST V3
+ * SERVICE_WORKER.JS of TEXT CASE CHANGER, an EXTENSION for CHROME MANIFEST V3
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
@@ -19,16 +19,16 @@ chrome.contextMenus.create({
   contexts: ["selection", "editable"],
 });
 
-// Submenu items: case functions
+// Submenu items: case functions with shortcuts in titles
 const cases = [
-  { id: "lowerCase",    title: "lower case",    icon: "images/lowercase-16.png" },
-  { id: "upperCase",    title: "UPPER CASE",    icon: "images/uppercase-16.png" },
-  { id: "invertCase",   title: "Invert cASE",   icon: "images/invertcase-16.png" },
-  { id: "sentenceCase", title: "Sentence Case", icon: "images/sentencecase-16.png" },
-  { id: "startCase",    title: "Start Case",    icon: "images/startcase-16.png" },
-  { id: "titleCase",    title: "Title Case",    icon: "images/titlecase-16.png" },
-  { id: "camelCase",    title: "camelCase",     icon: "images/camelcase-16.png" },
-  { id: "snakeCase",    title: "snake_case",    icon: "images/snakecase-16.png" },
+  { id: "lowerCase",    title: "lower case (Ctrl+Shift+L)" },
+  { id: "upperCase",    title: "UPPER CASE (Ctrl+Shift+U)" },
+  { id: "invertCase",   title: "Invert cASE" },
+  { id: "sentenceCase", title: "Sentence Case. (Ctrl+Shift+R)" },
+  { id: "startCase",    title: "Start Case" },
+  { id: "titleCase",    title: "Title Case (Ctrl+Shift+G)" },
+  { id: "camelCase",    title: "camelCase" },
+  { id: "snakeCase",    title: "snake_case" },
 ];
 
 // Create submenu items
@@ -53,4 +53,16 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       });
     }
   }
+});
+
+// Handle keyboard shortcut commands
+chrome.commands.onCommand.addListener((command) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length > 0 && tabs[0].id) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: "changeCase",
+        caseType: command
+      });
+    }
+  });
 });

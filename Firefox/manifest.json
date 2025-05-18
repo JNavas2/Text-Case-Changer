@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Text Case Changer",
   "version": "0.9.1",
-  "description": "Change Case of selected editable text by context menu.",
+  "description": "Change Case of selected editable text.",
   "icons": {
     "32": "images/icon-32.png",
     "48": "images/icon-48.png",
@@ -16,8 +16,7 @@
   "permissions": [
     "contextMenus",
     "activeTab",
-    "<all_urls>",
-    "tabs"
+    "<all_urls>"
   ],
   "content_scripts": [
     {
@@ -27,60 +26,28 @@
   ],
   "commands": {
     "lowerCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+L",
-        "mac": "Command+Alt+L"
-      },
-      "description": "Convert selection to lower case"
+      "description": "Change selection to lower case"
     },
     "upperCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+U",
-        "mac": "Command+Alt+U"
-      },
-      "description": "Convert selection to upper case"
+      "description": "Change selection to upper case"
     },
     "invertCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+V",
-        "mac": "Command+Alt+V"
-      },
-      "description": "Invert case of selection"
+      "description": "Invert the case of each letter in the selection"
     },
     "sentenceCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+S",
-        "mac": "Command+Alt+S"
-      },
-      "description": "Convert selection to sentence case"
+      "description": "Change selection to sentence case"
     },
     "startCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+R",
-        "mac": "Command+Alt+R"
-      },
-      "description": "Convert selection to start case"
+      "description": "Capitalize the first letter of each word in the selection"
     },
     "titleCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+T",
-        "mac": "Command+Alt+T"
-      },
-      "description": "Convert selection to title/headline case"
+      "description": "Change selection to title/headline case"
     },
     "camelCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+C",
-        "mac": "Command+Alt+C"
-      },
-      "description": "Convert selection to camelCase"
+      "description": "Change selection to camelCase"
     },
     "snakeCase": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+K",
-        "mac": "Command+Alt+K"
-      },
-      "description": "Convert selection to snake_case"
+      "description": "Change selection to snake_case"
     }
   }
 }
