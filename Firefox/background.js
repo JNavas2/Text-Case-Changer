@@ -19,41 +19,53 @@ browser.contextMenus.create({
   contexts: ["selection", "editable"],
 });
 
-// Submenu items: case functions
+// Submenu items: case functions with shortcuts in titles
 const cases = [
-  { id: "lowerCase",    title: "lower case",    icon: "images/lowercase-16.png" },
-  { id: "upperCase",    title: "UPPER CASE",    icon: "images/uppercase-16.png" },
-  { id: "invertCase",   title: "Invert cASE",   icon: "images/invertcase-16.png" },
-  { id: "sentenceCase", title: "Sentence Case", icon: "images/sentencecase-16.png" },
-  { id: "startCase",    title: "Start Case",    icon: "images/startcase-16.png" },
-  { id: "titleCase",    title: "Title Case",    icon: "images/titlecase-16.png" },
-  { id: "camelCase",    title: "camelCase",     icon: "images/camelcase-16.png" },
-  { id: "snakeCase",    title: "snake_case",    icon: "images/snakecase-16.png" },
+  { id: "lowerCase",    title: "lower case (Ctrl+Shift+L)",    icon: "images/lowercase-16.png" },
+  { id: "upperCase",    title: "UPPER CASE (Ctrl+Shift+U)",    icon: "images/uppercase-16.png" },
+  { id: "invertCase",   title: "Invert cASE (Ctrl+Shift+2)",   icon: "images/invertcase-16.png" },
+  { id: "sentenceCase", title: "Sentence Case (Ctrl+Shift+3)", icon: "images/sentencecase-16.png" },
+  { id: "startCase",    title: "Start Case (Ctrl+Shift+4)",    icon: "images/startcase-16.png" },
+  { id: "titleCase",    title: "Title Case (Ctrl+Shift+H)",    icon: "images/titlecase-16.png" },
+  { id: "camelCase",    title: "camelCase (Ctrl+Shift+Y)",     icon: "images/camelcase-16.png" },
+  { id: "snakeCase",    title: "snake_case (Ctrl+Shift+X)",    icon: "images/snakecase-16.png" },
 ];
 
-// Create submenu items
+// Create submenu items with icons and updated titles
 cases.forEach(item => {
-  const menuItem = {
+  browser.contextMenus.create({
     id: `text-case-changer-${item.id}`,
     parentId: "text-case-changer",
     title: item.title,
-    contexts: ["selection", "editable"]
-  };
-  // Add icon if specified
-  if (item.icon) {
-    menuItem.icons = { "16": item.icon };
-  }
-  browser.contextMenus.create(menuItem);
+    contexts: ["selection", "editable"],
+    icons: { "16": item.icon }
+  });
 });
 
-// Handle menu clicks
+// Handle context menu clicks
 browser.contextMenus.onClicked.addListener((info, tab) => {
   const prefix = "text-case-changer-";
   if (info.menuItemId.startsWith(prefix)) {
     const caseType = info.menuItemId.replace(prefix, "");
-    browser.tabs.sendMessage(tab.id, {
-      action: "changeCase",
-      caseType: caseType
-    });
+    if (tab && tab.id) {
+      browser.tabs.sendMessage(tab.id, {
+        action: "changeCase",
+        caseType: caseType
+      });
+    }
   }
+});
+
+// Handle keyboard shortcut commands
+browser.commands.onCommand.addListener((command) => {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    if (tabs.length > 0 && tabs[0].id) {
+      browser.tabs.sendMessage(tabs[0].id, {
+        action: "changeCase",
+        caseType: command
+      });
+    }
+  }).catch((error) => {
+    console.error("Error sending command message:", error);
+  });
 });

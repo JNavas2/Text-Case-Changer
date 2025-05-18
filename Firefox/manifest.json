@@ -24,5 +24,63 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "commands": {
+    "lowerCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+L",
+        "mac": "Command+Alt+L"
+      },
+      "description": "Convert selection to lower case"
+    },
+    "upperCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+U",
+        "mac": "Command+Alt+U"
+      },
+      "description": "Convert selection to upper case"
+    },
+    "invertCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+V",
+        "mac": "Command+Alt+V"
+      },
+      "description": "Invert case of selection"
+    },
+    "sentenceCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+S",
+        "mac": "Command+Alt+S"
+      },
+      "description": "Convert selection to sentence case"
+    },
+    "startCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+R",
+        "mac": "Command+Alt+R"
+      },
+      "description": "Convert selection to start case"
+    },
+    "titleCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+T",
+        "mac": "Command+Alt+T"
+      },
+      "description": "Convert selection to title/headline case"
+    },
+    "camelCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+C",
+        "mac": "Command+Alt+C"
+      },
+      "description": "Convert selection to camelCase"
+    },
+    "snakeCase": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+K",
+        "mac": "Command+Alt+K"
+      },
+      "description": "Convert selection to snake_case"
+    }
+  }
 }

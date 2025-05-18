@@ -11,7 +11,7 @@
   },
   "background": {
     "service_worker": "service_worker.js"
-  }
+  },
   "permissions": [
     "management",
     "contextMenus",
