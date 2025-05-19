@@ -35,7 +35,7 @@ function isAllUpperCase(word) {
  */
 function parseText(text) {
   // Unicode regex: matches words including possessives (e.g., John's, niños', l'été)
-  const wordRegex = /[\p{L}]+(?:'[\p{L}]+)*/gu;
+  const wordRegex = /[\p{L}]+(?:['’]s|['’])?/gu;
   const words = text.match(wordRegex) || [];
   // Split by words to get all separators, including empty strings
   const separators = text.split(wordRegex);
