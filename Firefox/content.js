@@ -51,6 +51,12 @@ function splitBaseAndSuffix(word) {
   };
 }
 
+function removePossessive(word) {
+  // If ends with 's or ’s, remove the apostrophe and keep the s
+  // If ends with just ' or ’, remove the apostrophe
+  return word.replace(/(['’])s$/i, 's').replace(/(['’])$/i, '');
+}
+
 // FUNCTIONS TO PARSE AND REASSEMBLE TEXT ////////////////////////////////////////////////////////////
 
 /**
@@ -260,69 +266,33 @@ function titleCase(text) {
 
 // CAMELCASE CONVERSION //////////////////////////////////////////////////////////////////////////////
 
-/**
- * Converts a text string to camelCase.
- * - First word is lowercased unless all uppercase.
- * - Subsequent words are capitalized unless all uppercase.
- * - Handles possessive suffixes and acronyms correctly.
- * @param {string} text
- * @returns {string}
- */
 function camelCase(text) {
   const parsed = parseText(text);
   const words = parsed.words.map((word, idx) => {
-    const { base, suffix } = splitBaseAndSuffix(word);
-    if (isAllUpperCase(base)) {
-      // Preserve all-uppercase base (acronym) and suffix
-      return base + suffix;
-    }
+    // Remove possessive punctuation
+    const base = removePossessive(word);
     if (idx === 0) {
-      // Lowercase first word's base and suffix
-      return base.toLowerCase() + suffix.toLowerCase();
+      // Lowercase the first word
+      return base.toLowerCase();
     }
-    // Capitalize first letter of base, lowercase the rest; lowercase suffix
-    return (
-      base.charAt(0).toUpperCase() +
-      base.slice(1).toLowerCase() +
-      suffix.toLowerCase()
-    );
+    // Capitalize first letter, lowercase the rest
+    return base.charAt(0).toUpperCase() + base.slice(1).toLowerCase();
   });
-  // Reassemble with no separators (empty array of separators)
+  // Reassemble with no separators
   return reassembleText({ words, separators: Array(words.length + 1).fill('') });
 }
 
 // SNAKE CASE CONVERSION & REASSEMBLY ////////////////////////////////////////////////////////////////
 
-/**
- * Converts input text to snake_case.
- * - Preserves all-uppercase acronyms and their suffixes.
- * - Lowercases possessive suffixes.
- * @param {string} text
- * @returns {string}
- */
 function snakeCase(text) {
-  // Parse the text into words and separators
   const parsed = parseText(text);
-  // Lowercase or preserve words as needed
-  parsed.words = parsed.words.map(word => {
-    const { base, suffix } = splitBaseAndSuffix(word);
-    if (isAllUpperCase(base)) {
-      // Preserve all-uppercase base and suffix
-      return base + suffix;
-    }
-    // Lowercase base and suffix
-    return base.toLowerCase() + suffix.toLowerCase();
-  });
-  // Replace all separators with underscores
+  parsed.words = parsed.words.map(word => removePossessive(word).toLowerCase());
   parsed.separators = parsed.separators.map(() => '_');
-  // Pad separators if needed
   while (parsed.separators.length < parsed.words.length) {
     parsed.separators.push('_');
   }
-  // Remove leading and trailing underscores (optional)
   if (parsed.separators[0] === '_') parsed.separators[0] = '';
   if (parsed.separators[parsed.separators.length - 1] === '_') parsed.separators[parsed.separators.length - 1] = '';
-  // Reassemble the text with underscores as separators
   return reassembleText(parsed);
 }
 
