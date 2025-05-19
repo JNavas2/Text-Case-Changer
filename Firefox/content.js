@@ -26,6 +26,31 @@ function isAllUpperCase(word) {
   return letters.join('') === letters.join('').toUpperCase();
 }
 
+/**
+ * Splits a word into its base part and possessive suffix (if any).
+ * Handles apostrophes like ' or ’ and optional trailing s.
+ * @param {string} word - The input word to split.
+ * @returns {{ base: string, suffix: string }} - The base word and suffix.
+ */
+function splitBaseAndSuffix(word) {
+  // Regex explanation:
+  // ^([\p{L}]+)   -> capture one or more Unicode letters at the start (base)
+  // (['’]s?|)     -> optional suffix: apostrophe (straight or curly) + optional s
+  // $             -> end of string
+  const match = word.match(/^([\p{L}]+)(['’]s?|)$/u);
+  if (match) {
+    return {
+      base: match[1],
+      suffix: match[2] || '',
+    };
+  }
+  // If no match, treat entire word as base, no suffix
+  return {
+    base: word,
+    suffix: '',
+  };
+}
+
 // FUNCTIONS TO PARSE AND REASSEMBLE TEXT ////////////////////////////////////////////////////////////
 
 /**
@@ -69,164 +94,168 @@ function reassembleText({ words, separators }) {
  */
 function lowerCase(text) {
   const parsed = parseText(text);
-  const words = parsed.words.map(word =>
-    isAllUpperCase(word) ? word : word.toLowerCase()
-  );
-  const changed = { words, separators: parsed.separators };
-  return reassembleText(changed);
+  const words = parsed.words.map(word => {
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Preserve uppercase base, lowercase suffix
+      return base + suffix.toLowerCase();
+    } else {
+      // Lowercase entire word
+      return (base + suffix).toLowerCase();
+    }
+  });
+  return reassembleText({ words, separators: parsed.separators });
 }
 
 /**
- * Converts all words in the text to uppercase, unless the word is already all uppercase.
+ * Converts all words in the text to uppercase, including possessive suffixes.
  * @param {string} text
  * @returns {string}
  */
 function upperCase(text) {
   const parsed = parseText(text);
-  const words = parsed.words.map(word =>
-    isAllUpperCase(word) ? word : word.toUpperCase()
-  );
-  const changed = { words, separators: parsed.separators };
-  return reassembleText(changed);
+  const words = parsed.words.map(word => word.toUpperCase());
+  return reassembleText({ words, separators: parsed.separators });
 }
 
 /**
  * Inverts the case of each letter in every word of the input text,
- * unless the word is all uppercase. Returns the changed text.
+ * unless the base word is all uppercase. Handles possessive suffixes correctly.
  * @param {string} text
  * @returns {string}
  */
 function invertCase(text) {
-  // Parse the input text
-  const parsedObject = parseText(text);
-
-  // Invert the case of each word (unless all uppercase)
-  const words = parsedObject.words.map(word =>
-    isAllUpperCase(word)
-      ? word
-      : Array.from(word).map(char =>
-          char === char.toUpperCase()
-            ? char.toLowerCase()
-            : char.toUpperCase()
-        ).join('')
-  );
-
-  // Reassemble the text with inverted words and original separators
-  const changedText = reassembleText({
-    words,
-    separators: parsedObject.separators
+  const parsed = parseText(text);
+  const words = parsed.words.map(word => {
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Already all uppercase, return as-is (including suffix)
+      return base + suffix;
+    } else {
+      // Invert case of base and suffix separately, then join
+      const invert = s => Array.from(s).map(
+        c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()
+      ).join('');
+      return invert(base) + invert(suffix);
+    }
   });
-
-  return changedText;
+  return reassembleText({ words, separators: parsed.separators });
 }
+
 /**
  * Converts a string to sentence case:
- *   - Capitalizes only the first word (unless it's all uppercase), lowercases others (unless all uppercase).
+ *   - Capitalizes only the first word (unless its base is all uppercase), lowercases others (unless all uppercase).
+ *   - Handles possessive suffixes correctly.
  * @param {string} text - The input text string.
  * @returns {string} - The sentence-cased string.
  */
 function sentenceCase(text) {
-  // Parse the text into words and separators
-  const parsedObject = parseText(text);
-
-  // Change case
-  const words = parsedObject.words.map((word, idx) => {
-    if (isAllUpperCase(word)) return word;
-    if (idx === 0) {
-      // Capitalize first letter, lowercase the rest
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  const parsed = parseText(text);
+  const words = parsed.words.map((word, idx) => {
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Already all uppercase, return as-is (with suffix)
+      return base + suffix;
     }
-    // Lowercase all other words
-    return word.toLowerCase();
+    if (idx === 0) {
+      // Capitalize first letter of base, lowercase the rest; lowercase suffix
+      return (
+        base.charAt(0).toUpperCase() +
+        base.slice(1).toLowerCase() +
+        suffix.toLowerCase()
+      );
+    }
+    // Lowercase base and suffix for all other words
+    return base.toLowerCase() + suffix.toLowerCase();
   });
-
-  // Reassemble text from the changed words and original separators
-  const changedObject = { words, separators: parsedObject.separators };
-  return reassembleText(changedObject);
+  return reassembleText({ words, separators: parsed.separators });
 }
 
 /**
- * Converts the first character of each word to uppercase and the rest to lowercase,
- * unless the word is already all uppercase. Accepts a text string, parses it,
- * applies the logic, and returns the changed text.
- * @param {string} text
- * @returns {string}
+ * Converts a string to start case:
+ *   - Capitalizes the first letter of each word's base, lowercases the rest (unless base is all uppercase).
+ *   - Lowercases possessive suffixes.
+ *   - Handles possessive suffixes and acronyms correctly.
+ * @param {string} text - The input text string.
+ * @returns {string} - The start-cased string.
  */
 function startCase(text) {
-  // Parse the input text into words and separators
-  const parsedObject = parseText(text);
-
-  // Change the case
-  const changedWords = parsedObject.words.map(word =>
-    isAllUpperCase(word)
-      ? word
-      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  );
-
-  // Create new parsed object with changed words
-  const changedObject = {
-    words: changedWords,
-    separators: parsedObject.separators
-  };
-
-  // Reassemble and return the changed text
-  return reassembleText(changedObject);
+  const parsed = parseText(text);
+  const words = parsed.words.map(word => {
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Already all uppercase, return as-is (with suffix)
+      return base + suffix;
+    }
+    // Capitalize first letter of base, lowercase the rest; lowercase suffix
+    return (
+      base.charAt(0).toUpperCase() +
+      base.slice(1).toLowerCase() +
+      suffix.toLowerCase()
+    );
+  });
+  return reassembleText({ words, separators: parsed.separators });
 }
 
 // TITLE CASE CONVERSION /////////////////////////////////////////////////////////////////////////////
 
 /**
  * Converts a text string to title case following specific rules.
+ * Handles possessive suffixes and acronyms correctly.
  * @param {string} text - The text to convert.
  * @returns {string} - The title-cased text.
  */
 function titleCase(text) {
-  // Step 1: Parse the text into words and separators
-  const parsedObject = parseText(text);
-  const { words } = parsedObject;
+  const parsed = parseText(text);
+  const { words } = parsed;
   const len = words.length;
   const result = [];
-
-  // Step 2: Apply title case logic to each word
   for (let i = 0; i < len; i++) {
-    let word = words[i];
-    if (isAllUpperCase(word)) {
-      result.push(word);
+    const word = words[i];
+    const { base, suffix } = splitBaseAndSuffix(word);
+    // If base is all uppercase, preserve as-is (with suffix)
+    if (isAllUpperCase(base)) {
+      result.push(base + suffix);
       continue;
     }
-
-    const lower = word.toLowerCase();
-
+    const lowerBase = base.toLowerCase();
+    const lowerSuffix = suffix.toLowerCase();
     // Always capitalize first and last word
     if (i === 0 || i === len - 1) {
-      result.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+      result.push(
+        lowerBase.charAt(0).toUpperCase() +
+        lowerBase.slice(1) +
+        lowerSuffix
+      );
       continue;
     }
-
     // Capitalize "to" in infinitives: look for "to" followed by a verb (simplified: any word after "to")
-    if (lower === "to" && i + 1 < len) {
+    if (lowerBase === "to" && i + 1 < len) {
       result.push("To");
       continue;
     }
-
-    // Capitalize all words of 4+ letters
-    if (word.length >= 4) {
-      result.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    // Capitalize all words of 4+ letters (base only)
+    if (base.length >= 4) {
+      result.push(
+        lowerBase.charAt(0).toUpperCase() +
+        lowerBase.slice(1) +
+        lowerSuffix
+      );
       continue;
     }
-
     // Do not capitalize minor words (if 3 letters or fewer)
-    if (minorWords.has(lower)) {
-      result.push(lower);
+    if (minorWords.has(lowerBase)) {
+      result.push(lowerBase + lowerSuffix);
       continue;
     }
-
     // Otherwise, capitalize principal words
-    result.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    result.push(
+      lowerBase.charAt(0).toUpperCase() +
+      lowerBase.slice(1) +
+      lowerSuffix
+    );
   }
-
-  // Step 3: Reassemble and return the changed text
-  return reassembleText({ words: result, separators: parsedObject.separators });
+  return reassembleText({ words: result, separators: parsed.separators });
 }
 
 // CAMELCASE CONVERSION //////////////////////////////////////////////////////////////////////////////
@@ -235,19 +264,28 @@ function titleCase(text) {
  * Converts a text string to camelCase.
  * - First word is lowercased unless all uppercase.
  * - Subsequent words are capitalized unless all uppercase.
+ * - Handles possessive suffixes and acronyms correctly.
  * @param {string} text
  * @returns {string}
  */
 function camelCase(text) {
   const parsed = parseText(text);
   const words = parsed.words.map((word, idx) => {
-    if (isAllUpperCase(word)) return word;
-    if (idx === 0) {
-      // Lowercase the first word
-      return word.toLowerCase();
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Preserve all-uppercase base (acronym) and suffix
+      return base + suffix;
     }
-    // Capitalize first letter, lowercase the rest
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    if (idx === 0) {
+      // Lowercase first word's base and suffix
+      return base.toLowerCase() + suffix.toLowerCase();
+    }
+    // Capitalize first letter of base, lowercase the rest; lowercase suffix
+    return (
+      base.charAt(0).toUpperCase() +
+      base.slice(1).toLowerCase() +
+      suffix.toLowerCase()
+    );
   });
   // Reassemble with no separators (empty array of separators)
   return reassembleText({ words, separators: Array(words.length + 1).fill('') });
@@ -256,30 +294,34 @@ function camelCase(text) {
 // SNAKE CASE CONVERSION & REASSEMBLY ////////////////////////////////////////////////////////////////
 
 /**
- * Converts input text to snake_case using parseText and reassembleText logic.
+ * Converts input text to snake_case.
+ * - Preserves all-uppercase acronyms and their suffixes.
+ * - Lowercases possessive suffixes.
  * @param {string} text
  * @returns {string}
  */
 function snakeCase(text) {
   // Parse the text into words and separators
   const parsed = parseText(text);
-
-  // Lowercase all words (snake_case logic)
-  parsed.words = parsed.words.map(word => word.toLowerCase());
-
+  // Lowercase or preserve words as needed
+  parsed.words = parsed.words.map(word => {
+    const { base, suffix } = splitBaseAndSuffix(word);
+    if (isAllUpperCase(base)) {
+      // Preserve all-uppercase base and suffix
+      return base + suffix;
+    }
+    // Lowercase base and suffix
+    return base.toLowerCase() + suffix.toLowerCase();
+  });
   // Replace all separators with underscores
-  // (One less separator than words, so fill the rest with '')
   parsed.separators = parsed.separators.map(() => '_');
-  // If separators array is shorter than words, pad it
+  // Pad separators if needed
   while (parsed.separators.length < parsed.words.length) {
     parsed.separators.push('_');
   }
-
-  // Remove leading and trailing underscores (if any)
-  // (Optional: depends on your requirements. If you want to keep them, remove this part.)
+  // Remove leading and trailing underscores (optional)
   if (parsed.separators[0] === '_') parsed.separators[0] = '';
   if (parsed.separators[parsed.separators.length - 1] === '_') parsed.separators[parsed.separators.length - 1] = '';
-
   // Reassemble the text with underscores as separators
   return reassembleText(parsed);
 }
@@ -303,7 +345,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const fn = caseFunctions[message.caseType];
     if (typeof fn !== "function") {
       console.error("Unknown case type:", message.caseType);
-    return;
+      return;
     }
     const active = document.activeElement;
     if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
