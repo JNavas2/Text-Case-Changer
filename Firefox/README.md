@@ -13,7 +13,7 @@ Use context menu or shortcut to select desired case change:
 **[Text Case Changer – Get this Extension for 🦊 Firefox (en-US)](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/)**
 
 **NOTES**:
-1. Undo (Ctrl+Z) can be used to revert changes.
+1. Undo (Ctrl+Z) can often be used to revert changes.
 2. Shortcuts can be set for case functions in the browser.
 3. All caps words (e.g., CIA) are changed only in camel & snake.
 4. All words in AP style titles are capitalized except for certain short words, such as articles and short prepositions.

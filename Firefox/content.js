@@ -330,7 +330,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (start !== end) {
         let selected = active.value.substring(start, end);
         selected = fn(selected);
-        active.setRangeText(selected, start, end, "end");
+        // Select the text to replace
+        active.setSelectionRange(start, end);
+        // Use execCommand to insert text, enabling undo
+        document.execCommand('insertText', false, selected); //DEPRECATED, NO ALTERNATIVE, STILL WORKS
       }
     } else if (active && active.isContentEditable) {
       const sel = window.getSelection();
@@ -339,14 +342,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!range.collapsed && active.contains(range.commonAncestorContainer)) {
           let selected = sel.toString();
           const newText = fn(selected);
-          range.deleteContents();
-          const textNode = document.createTextNode(newText);
-          range.insertNode(textNode);
-          sel.removeAllRanges();
-          const newRange = document.createRange();
-          newRange.setStartBefore(textNode);
-          newRange.setEndAfter(textNode);
-          sel.addRange(newRange);
+          // Selection is already set, just insert
+          document.execCommand('insertText', false, newText); //DEPRECATED, NO ALTERNATIVE, STILL WORKS
         }
       }
     }
