@@ -1,4 +1,4 @@
-# Welcome to Text Case Changer
+# Welcome to Text Case Changer for Firefox
 Browser extension to quickly change the case of selected editable text.   
 Use context menu or shortcut to select desired case change:
 * lower case
@@ -9,6 +9,8 @@ Use context menu or shortcut to select desired case change:
 * Title Case (AP style)
 * camelCase
 * snake_case
+
+**[Text Case Changer – Get this Extension for 🦊 Firefox (en-US)](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/)**
 
 **NOTES**:
 1. Undo (Ctrl+Z) can be used to revert changes.
