@@ -10,7 +10,7 @@ Use context menu or shortcut to select desired case change:
 * camelCase
 * snake_case
 
-**[Text Case Changer – Get this Extension for 🦊 Firefox (en-US)]([url](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/))**
+**[Text Case Changer – Get this Extension for 🦊 Firefox (en-US)](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/)**
 
 **NOTES**:
 1. Undo (Ctrl+Z) can be used to revert changes.
