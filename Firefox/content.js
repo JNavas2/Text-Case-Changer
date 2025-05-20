@@ -3,6 +3,9 @@
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
+// SHIM FOR COMPATIBILITY WITH CHROME, WHICH USES `chrome` INSTEAD OF `browser` //////////////////
+window.browser = window.browser || window.chrome;
+
 // CONSTANTS /////////////////////////////////////////////////////////////////////////////////////
 
 // Common articles, conjunctions, prepositions ≤3 letters
@@ -12,7 +15,7 @@ const minorWords = new Set([
   "as", "at", "by", "in", "of", "off", "on", "per", "to", "up", "via" // prepositions
 ]);
 
-// HELPER FUNCTIONS /////////////////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////
 
 /**
  * Checks if a word is all uppercase (ignores non-letter characters).
@@ -57,7 +60,7 @@ function removePossessive(word) {
   return word.replace(/(['’])s$/i, 's').replace(/(['’])$/i, '');
 }
 
-// FUNCTIONS TO PARSE AND REASSEMBLE TEXT ////////////////////////////////////////////////////////////
+// FUNCTIONS TO PARSE AND REASSEMBLE TEXT ///////////////////////////////////////////////////////
 
 /**
  * Parses the input text into words and separators.
@@ -91,7 +94,7 @@ function reassembleText({ words, separators }) {
   return result;
 }
 
-// SIMPLE CASE CONVERSION FUNCTIONS //////////////////////////////////////////////////////////////////////
+// SIMPLE CASE CONVERSION FUNCTIONS ///////////////////////////////////////////////////////////////
 
 /**
  * Converts all words in the text to lowercase, unless the word is already all uppercase.

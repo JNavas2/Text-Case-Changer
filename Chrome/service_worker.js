@@ -90,12 +90,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       chrome.tabs.sendMessage(tab.id, {
         action: "changeCase",
         caseType: caseType
-      }, () => {
-        if (chrome.runtime.lastError) {
-          // Log error if content script is not available
-          console.error("Failed to send menu message to content script:", chrome.runtime.lastError);
-        }
       });
+      // Callback removed: no response expected or needed
     }
   }
 });
@@ -114,12 +110,8 @@ chrome.commands.onCommand.addListener((command) => {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "changeCase",
           caseType: command
-        }, () => {
-          if (chrome.runtime.lastError) {
-            // Log error if content script is not available
-            console.error("Failed to send command message to content script:", chrome.runtime.lastError);
-          }
         });
+        // Callback removed: no response expected or needed
       }
     });
   }

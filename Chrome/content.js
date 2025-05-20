@@ -3,6 +3,9 @@
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
+// SHIM FOR COMPATIBILITY WITH CHROME, WHICH USES `chrome` INSTEAD OF `browser` //////////////////
+window.browser = window.browser || window.chrome;
+
 // CONSTANTS /////////////////////////////////////////////////////////////////////////////////////
 
 // Common articles, conjunctions, prepositions ≤3 letters
@@ -316,7 +319,7 @@ const caseFunctions = {
 };
 
 // Listen for messages from background.js
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "changeCase") {
     const fn = caseFunctions[message.caseType];
     if (typeof fn !== "function") {
