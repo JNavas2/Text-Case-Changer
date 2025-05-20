@@ -1,5 +1,5 @@
 /**
- * CONTEXT.JS of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
+ * CONTENT.JS of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
@@ -95,10 +95,16 @@ function reassembleText({ words, separators }) {
 
 /**
  * Converts all words in the text to lowercase, unless the word is already all uppercase.
+ * But if all letters in the selection are uppercase, convert the entire selection to lowercase.
  * @param {string} text
  * @returns {string}
  */
 function lowerCase(text) {
+  if (isAllUpperCase(text)) {
+    // Edge case: all letters in the selection are uppercase
+    return text.toLowerCase();
+  }
+  // Converts all words in the text to lowercase, unless the word is already all uppercase
   const parsed = parseText(text);
   const words = parsed.words.map(word => {
     const { base, suffix } = splitBaseAndSuffix(word);
