@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Text Case Changer",
+  "version": "0.9.2",
+  "description": "Change Case of selected editable text.",
+  "icons": {
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "64": "images/icon-64.png",
+    "128": "images/icon-128.png"
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "commands": {
+    "lowerCase": {
+      "description": "Change selection to lower case"
+    },
+    "upperCase": {
+      "description": "Change selection to upper case"
+    },
+    "invertCase": {
+      "description": "Invert the case of each letter in the selection"
+    },
+    "sentenceCase": {
+      "description": "Change selection to sentence case"
+    },
+    "startCase": {
+      "description": "Capitalize the first letter of each word in the selection"
+    },
+    "titleCase": {
+      "description": "Change selection to title/headline case"
+    },
+    "camelCase": {
+      "description": "Change selection to camelCase"
+    },
+    "snakeCase": {
+      "description": "Change selection to snake_case"
+    }
+  }
+}
