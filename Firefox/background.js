@@ -1,10 +1,12 @@
 /**
  * BACKGROUND.JS of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
+ * SUPPORTS BOTH DESKTOP AND ANDROID
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
-// Helper function to create context menus
+// Helper function to create context menus (desktop only)
 function createContextMenus() {
+  if (!browser.contextMenus) return; // Do nothing if not supported (e.g., Android)
   // Create the parent context menu for editable selections
   browser.contextMenus.create({
     id: "text-case-changer",
@@ -66,41 +68,47 @@ browser.runtime.onInstalled.addListener((details) => {
       url: browser.runtime.getURL("onboarding.html")
     });
   }
-  // Always clear and recreate context menus on install/update
-  browser.contextMenus.removeAll().then(createContextMenus);
+  // Always clear and recreate context menus on install/update (desktop only)
+  if (browser.contextMenus) {
+    browser.contextMenus.removeAll().then(createContextMenus);
+  }
 });
 
-// Also clear and recreate context menus at startup (for extension reloads)
+// Also clear and recreate context menus at startup (for extension reloads, desktop only)
 browser.runtime.onStartup.addListener(() => {
-  browser.contextMenus.removeAll().then(createContextMenus);
+  if (browser.contextMenus) {
+    browser.contextMenus.removeAll().then(createContextMenus);
+  }
 });
 
-// Handle context menu clicks
-browser.contextMenus.onClicked.addListener((info, tab) => {
-  const prefix = "text-case-changer-";
-  if (info.menuItemId === "text-case-changer-edit-shortcuts") {
-    // Open Firefox shortcut settings
-    if (browser.commands && browser.commands.openShortcutSettings) {
-      browser.commands.openShortcutSettings();
-    } else {
-      // Fallback: open about:addons (not as direct, but helpful)
-      browser.tabs.create({ url: "about:addons" });
+// Handle context menu clicks (desktop only)
+if (browser.contextMenus) {
+  browser.contextMenus.onClicked.addListener((info, tab) => {
+    const prefix = "text-case-changer-";
+    if (info.menuItemId === "text-case-changer-edit-shortcuts") {
+      // Open Firefox shortcut settings
+      if (browser.commands && browser.commands.openShortcutSettings) {
+        browser.commands.openShortcutSettings();
+      } else {
+        // Fallback: open about:addons (not as direct, but helpful)
+        browser.tabs.create({ url: "about:addons" });
+      }
+      return;
     }
-    return;
-  }
-  if (info.menuItemId.startsWith(prefix)) {
-    const caseType = info.menuItemId.replace(prefix, "");
-    if (tab && tab.id) {
-      browser.tabs.sendMessage(tab.id, {
-        action: "changeCase",
-        caseType: caseType
-      }).catch(e => {
-        // Log error if content script is not available
-        console.error("Failed to send menu message to content script:", e);
-      });
+    if (info.menuItemId.startsWith(prefix)) {
+      const caseType = info.menuItemId.replace(prefix, "");
+      if (tab && tab.id) {
+        browser.tabs.sendMessage(tab.id, {
+          action: "changeCase",
+          caseType: caseType
+        }).catch(e => {
+          // Log error if content script is not available
+          console.error("Failed to send menu message to content script:", e);
+        });
+      }
     }
-  }
-});
+  });
+}
 
 // Handle extension commands (keyboard shortcuts)
 browser.commands.onCommand.addListener((command) => {
@@ -119,6 +127,21 @@ browser.commands.onCommand.addListener((command) => {
         }).catch(e => {
           // Log error if content script is not available
           console.error("Failed to send command message to content script:", e);
+        });
+      }
+    });
+  }
+});
+
+// Listen for messages from popup (works on both desktop and Android)
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message && message.action === "popupCaseChange" && message.caseType) {
+    // Get the active tab in the current window
+    return browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0] && tabs[0].id) {
+        return browser.tabs.sendMessage(tabs[0].id, {
+          action: "changeCase",
+          caseType: message.caseType
         });
       }
     });

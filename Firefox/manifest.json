@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Text Case Changer",
-  "version": "0.9.2",
+  "version": "0.9.4",
   "description": "Change Case of selected editable text.",
   "icons": {
     "32": "images/icon-32.png",
@@ -24,6 +24,11 @@
       "js": ["content.js"]
     }
   ],
+  "browser_action": {
+    "default_icon": "images/icon-32.png",
+    "default_title": "Change Text Case",
+    "default_popup": "popup.html"
+  },
   "commands": {
     "lowerCase": {
       "description": "Change selection to lower case"
@@ -48,6 +53,11 @@
     },
     "snakeCase": {
       "description": "Change selection to snake_case"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko_android": {
+      "strict_min_version": "113.0"
     }
   }
 }

@@ -1,7 +1,15 @@
 /**
- * SERVICE_WORKER.JS of TEXT CASE CHANGER, an EXTENSION for GOOGLE CHROME
+ * SERVICE_WORKER.JS of TEXT CASE CHANGER, an EXTENSION for GOOGLE CHROME AND MICROSOFT EDGE
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
+
+// Returns the correct URL for the shortcuts page based on the browser (Chrome or Edge)
+function getShortcutsURL() {
+  if (navigator.userAgent.includes("Edg/")) {
+    return "edge://extensions/shortcuts";
+  }
+  return "chrome://extensions/shortcuts";
+}
 
 // Helper function to create context menus
 function createContextMenus() {
@@ -14,14 +22,14 @@ function createContextMenus() {
 
   // Submenu items
   const cases = [
-    { id: "lowerCase",    title: "lower case" },
-    { id: "upperCase",    title: "UPPER CASE" },
-    { id: "invertCase",   title: "Invert cASE" },
+    { id: "lowerCase", title: "lower case" },
+    { id: "upperCase", title: "UPPER CASE" },
+    { id: "invertCase", title: "Invert cASE" },
     { id: "sentenceCase", title: "Sentence Case." },
-    { id: "startCase",    title: "Start Case" },
-    { id: "titleCase",    title: "Title Case" },
-    { id: "camelCase",    title: "camelCase" },
-    { id: "snakeCase",    title: "snake_case" },
+    { id: "startCase", title: "Start Case" },
+    { id: "titleCase", title: "Title Case" },
+    { id: "camelCase", title: "camelCase" },
+    { id: "snakeCase", title: "snake_case" },
   ];
 
   cases.forEach((item) => {
@@ -80,8 +88,7 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   const prefix = "text-case-changer-";
   if (info.menuItemId === "text-case-changer-edit-shortcuts") {
-    // Open Chrome shortcut settings
-    chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
+    chrome.tabs.create({ url: getShortcutsURL() });
     return;
   }
   if (info.menuItemId.startsWith(prefix)) {

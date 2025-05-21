@@ -1,5 +1,6 @@
 /**
  * CONTENT.JS of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
+ * SUPPORTS BOTH DESKTOP AND ANDROID
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
@@ -31,16 +32,13 @@ function isAllUpperCase(word) {
 
 /**
  * Splits a word into its base part and possessive suffix (if any).
- * Handles apostrophes like ' or ’ and optional trailing s.
+ * Handles ordinals and possessives.
  * @param {string} word - The input word to split.
  * @returns {{ base: string, suffix: string }} - The base word and suffix.
  */
 function splitBaseAndSuffix(word) {
-  // Regex explanation:
-  // ^([\p{L}]+)   -> capture one or more Unicode letters at the start (base)
-  // (['’]s?|)     -> optional suffix: apostrophe (straight or curly) + optional s
-  // $             -> end of string
-  const match = word.match(/^([\p{L}]+)(['’]s?|)$/u);
+  // Match base (either digits+letters or just letters) and optional possessive suffix
+  const match = word.match(/^((?:\d+\p{L}+|[\p{L}]+))(['’]s?|)$/u);
   if (match) {
     return {
       base: match[1],
@@ -68,8 +66,11 @@ function removePossessive(word) {
  * @returns {{words: string[], separators: string[]}}
  */
 function parseText(text) {
-  // Unicode regex: matches words including possessives (e.g., John's, niños', l'été)
-  const wordRegex = /[\p{L}]+(?:['’]s|['’])?/gu;
+  // Match words that are either:
+  // - digits followed by letters (e.g., 5th, 21st)
+  // - or just letters (e.g., Circuit, John's)
+  // - with optional possessive endings
+  const wordRegex = /(?:\d+\p{L}+|[\p{L}]+)(?:['’]s|['’])?/gu;
   const words = text.match(wordRegex) || [];
   // Split by words to get all separators, including empty strings
   const separators = text.split(wordRegex);
@@ -216,7 +217,7 @@ function startCase(text) {
 
 /**
  * Converts a text string to title case following specific rules.
- * Handles possessive suffixes and acronyms correctly.
+ * Handles ordinals, possessive suffixes, acronyms, and minor words correctly.
  * @param {string} text - The text to convert.
  * @returns {string} - The title-cased text.
  */
@@ -228,13 +229,22 @@ function titleCase(text) {
   for (let i = 0; i < len; i++) {
     const word = words[i];
     const { base, suffix } = splitBaseAndSuffix(word);
+
     // If base is all uppercase, preserve as-is (with suffix)
     if (isAllUpperCase(base)) {
       result.push(base + suffix);
       continue;
     }
+
+    // If base starts with a digit (ordinal, etc.), preserve as-is (with suffix)
+    if (/^\d/.test(base)) {
+      result.push(base + suffix);
+      continue;
+    }
+
     const lowerBase = base.toLowerCase();
     const lowerSuffix = suffix.toLowerCase();
+
     // Always capitalize first and last word
     if (i === 0 || i === len - 1) {
       result.push(
@@ -244,11 +254,13 @@ function titleCase(text) {
       );
       continue;
     }
+
     // Capitalize "to" in infinitives: look for "to" followed by a verb (simplified: any word after "to")
     if (lowerBase === "to" && i + 1 < len) {
       result.push("To");
       continue;
     }
+
     // Capitalize all words of 4+ letters (base only)
     if (base.length >= 4) {
       result.push(
@@ -258,11 +270,13 @@ function titleCase(text) {
       );
       continue;
     }
+
     // Do not capitalize minor words (if 3 letters or fewer)
     if (minorWords.has(lowerBase)) {
       result.push(lowerBase + lowerSuffix);
       continue;
     }
+
     // Otherwise, capitalize principal words
     result.push(
       lowerBase.charAt(0).toUpperCase() +

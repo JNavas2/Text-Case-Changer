@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Text Case Changer",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Change Case of selected editable text.",
   "icons": {
     "32": "images/icon-32.png",
