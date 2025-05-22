@@ -2,13 +2,14 @@
 POPUP.HTML of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
 REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
 © JOHN NAVAS 2025, ALL RIGHTS RESERVED
- -->
+-->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>Text Case Changer</title>
   <style>
     body {
@@ -59,11 +60,49 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
     }
 
     .separator {
-      width: 80%;
+      width: 60%;
       border: none;
       border-top: 1.5px solid #ccc;
       margin: 0 0;
-      /* Reduced vertical margin */
+    }
+
+    /* Responsive styles */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 1.1rem;
+      }
+
+      button {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 12px 0;
+      }
+
+      .button-group {
+        gap: 10px;
+      }
+
+      img[alt="icon"] {
+        height: 28px;
+        width: 28px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      h2 {
+        font-size: 1rem;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      button {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>

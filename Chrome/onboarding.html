@@ -2,111 +2,127 @@
 ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-<meta charset="UTF-8" />
-<meta content="width=device-width, initial-scale=1" name="viewport" />
-<title>Welcome to Text Case Changer</title>
-<style>
-body {
-	font-family: Arial, sans-serif;
-	padding: 20px;
-	max-width: 600px;
-	margin: auto;
-	background: #f9f9f9;
-}
-h1 {
-	color: #2c3e50;
-	font-size: 2rem;
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-button {
-	background-color: #e74c3c;
-	color: white;
-	border: none;
-	padding: 8px 12px;
-	font-size: 1rem;
-	cursor: pointer;
-	border-radius: 4px;
-}
-button:hover {
-	background-color: #c0392b;
-}
-.auto-style1 {
-	font-size: x-large;
-}
-/* Responsive styles */
-@media (max-width: 600px) {
-body {
-	padding: 10px;
-	max-width: 100%;
-}
-h1 {
-	font-size: 1.3rem;
-}
-button {
-	width: 100%;
-	font-size: 1.1rem;
-	padding: 12px 0;
-}
-ul {
-	padding-left: 20px;
-}
-img[alt=Icon] {
-	height: 28px;
-	width: 28px;
-}
-}
-@media (max-width: 400px) {
-h1 {
-	font-size: 1rem;
-	flex-direction: column;
-	gap: 4px;
-}
-button {
-	font-size: 1rem;
-}
-}
-.auto-style2 {
-	text-decoration: underline;
-}
-</style>
+	<meta charset="UTF-8" />
+	<meta content="width=device-width, initial-scale=1" name="viewport" />
+	<title>Welcome to Text Case Changer</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 24px auto;
+			max-width: 460px;
+			min-width: 220px;
+			padding: 16px;
+			box-sizing: border-box;
+			background: #fff;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+		}
+
+		h1 {
+			color: #2c3e50;
+			font-size: 2rem;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		button {
+			background-color: #e74c3c;
+			color: white;
+			border: none;
+			padding: 8px 12px;
+			font-size: 1rem;
+			cursor: pointer;
+			border-radius: 4px;
+		}
+
+		button:hover {
+			background-color: #c0392b;
+		}
+
+		.auto-style1 {
+			font-size: x-large;
+		}
+
+		/* Responsive styles */
+		@media (max-width: 600px) {
+			body {
+				padding: 10px;
+				max-width: 100%;
+			}
+
+			h1 {
+				font-size: 1.3rem;
+			}
+
+			button {
+				width: 100%;
+				font-size: 1.1rem;
+				padding: 12px 0;
+			}
+
+			ul {
+				padding-left: 20px;
+			}
+
+			img[alt=Icon] {
+				height: 28px;
+				width: 28px;
+			}
+		}
+
+		@media (max-width: 400px) {
+			h1 {
+				font-size: 1rem;
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			button {
+				font-size: 1rem;
+			}
+		}
+
+		.auto-style2 {
+			text-decoration: underline;
+		}
+	</style>
 </head>
 
 <body>
 
-<h1 class="auto-style1">
-<img alt="Icon" height="32" src="images/icon-32.png" width="32"> Welcome to Text 
-Case Changer </h1>
-<p>Extension to quickly change the case of selected editable text.<br>Use context 
-menu or shortcut to select desired case change:</p>
-<ul>
-	<li>lower case</li>
-	<li>UPPER CASE</li>
-	<li>Invert cASE</li>
-	<li>Sentence Case.</li>
-	<li>Start Case</li>
-	<li class="auto-style2">Title Case (AP style)</li>
-	<li>camelCase</li>
-	<li>snake_case </li>
-</ul>
-<p>NOTES:</p>
-<ol>
-	<li>Undo (Ctrl+Z) can often be used to revert changes.</li>
-	<li>Shortcuts can be set for case functions in the browser.</li>
-	<li>All caps words (e.g., CIA) are changed only in camel &amp; snake.</li>
-	<li>All words in AP style titles are capitalized except for certain<br>short 
-	words, such as articles and short prepositions.</li>
-	<li>Refresh any open tabs to enable this extension in them. </li>
-</ol>
-<p><strong>PRIVACY:</strong> This extension does <em>not</em> collect user information.</p>
-<button id="removeBtn">Remove Extension</button>
-<script src="onboarding.js"></script>
+	<h1 class="auto-style1">
+		<img alt="Icon" height="32" src="images/icon-32.png" width="32"> Welcome to Text
+		Case Changer
+	</h1>
+	<p>Extension to change the case of selected editable text.<br>Use context menu or
+		shortcut to select desired change:</p>
+	<ul>
+		<li>lower case</li>
+		<li>UPPER CASE</li>
+		<li>Invert cASE</li>
+		<li>Sentence Case.</li>
+		<li>Start Case</li>
+		<li class="auto-style2">Title Case (AP style)</li>
+		<li>camelCase</li>
+		<li>snake_case </li>
+	</ul>
+	<p>NOTES:</p>
+	<ol>
+		<li>Undo (Ctrl+Z) can often be used to revert changes.</li>
+		<li>Shortcuts can be set for case functions in the browser.</li>
+		<li>All caps words (e.g., CIA) are changed only in camel &amp; snake.</li>
+		<li>All words in AP style titles are capitalized except for certain<br>short
+			words, such as articles and short prepositions.</li>
+		<li>Refresh any open tabs to enable this extension in them. </li>
+	</ol>
+	<p><strong>PRIVACY:</strong> This extension does <em>not</em> collect user information.</p>
+	<button id="removeBtn">Remove Extension</button>
+	<script src="onboarding.js"></script>
 
 </body>
 
