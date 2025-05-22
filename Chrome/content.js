@@ -181,7 +181,14 @@ function sentenceCase(text) {
         suffix.toLowerCase()
       );
     }
-    // Lowercase base and suffix for all other words
+    // Preserve proper nouns: if word is already capitalized, keep it
+    if (
+      base.charAt(0) === base.charAt(0).toUpperCase() &&
+      base.slice(1) === base.slice(1).toLowerCase()
+    ) {
+      return base + suffix;
+    }
+    // Otherwise, lowercase base and suffix
     return base.toLowerCase() + suffix.toLowerCase();
   });
   return reassembleText({ words, separators: parsed.separators });
