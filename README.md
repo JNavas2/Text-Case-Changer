@@ -6,7 +6,7 @@ Use context menu or shortcut to select desired case change:
 * Invert cASE
 * Sentence Case.
 * Start Case
-* Title Case (AP style)
+* <ins>Title Case (AP style)</ins>
 * camelCase
 * snake_case
 
