@@ -37,15 +37,15 @@ function isAllUpperCase(word) {
  * @returns {{ base: string, suffix: string }} - The base word and suffix.
  */
 function splitBaseAndSuffix(word) {
-  // Match base (either digits+letters or just letters) and optional possessive suffix
-  const match = word.match(/^((?:\d+\p{L}+|[\p{L}]+))(['’]s?|)$/u);
+  // Only split possessive: 's or ’s at end
+  const match = word.match(/^([\p{L}\d]+)(['’]s)$/u);
   if (match) {
     return {
       base: match[1],
-      suffix: match[2] || '',
+      suffix: match[2],
     };
   }
-  // If no match, treat entire word as base, no suffix
+  // Otherwise, treat the whole word as base
   return {
     base: word,
     suffix: '',
@@ -66,11 +66,8 @@ function removePossessive(word) {
  * @returns {{words: string[], separators: string[]}}
  */
 function parseText(text) {
-  // Match words that are either:
-  // - digits followed by letters (e.g., 5th, 21st)
-  // - or just letters (e.g., Circuit, John's)
-  // - with optional possessive endings
-  const wordRegex = /(?:\d+\p{L}+|[\p{L}]+)(?:['’]s|['’])?/gu;
+// Match words including contractions and possessives
+const wordRegex = /(?:\d+\p{L}+|[\p{L}]+(?:['’][\p{L}]+)?)/gu;
   const words = text.match(wordRegex) || [];
   // Split by words to get all separators, including empty strings
   const separators = text.split(wordRegex);
