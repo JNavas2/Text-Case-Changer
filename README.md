@@ -15,6 +15,8 @@ Use context menu or shortcut to select desired case change:
 * Edge (soon)
 * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/)
 
+**Support**: Open an Issue to report a **bug** or make a **suggestion**.
+
 **Notes**:
 1. Undo (Ctrl+Z) can often be used to revert changes.
 2. Shortcuts can be set for case functions in the browser.
