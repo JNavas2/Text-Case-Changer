@@ -66,10 +66,9 @@ function removePossessive(word) {
  * @returns {{words: string[], separators: string[]}}
  */
 function parseText(text) {
-// Match words including contractions and possessives
-const wordRegex = /(?:\d+\p{L}+|[\p{L}]+(?:['’][\p{L}]+)?)/gu;
+  // Match words including contractions, possessives, and standalone numbers
+  const wordRegex = /(?:\d+\p{L}+|[\p{L}]+(?:['’][\p{L}]+)?|\d+)/gu;
   const words = text.match(wordRegex) || [];
-  // Split by words to get all separators, including empty strings
   const separators = text.split(wordRegex);
   return {
     words,
