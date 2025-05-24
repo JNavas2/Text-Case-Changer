@@ -156,7 +156,9 @@ function invertCase(text) {
 
 /**
  * Converts a string to sentence case:
- *   - Capitalizes only the first word (unless its base is all uppercase), lowercases others (unless all uppercase).
+ *   - Capitalizes only the first word (unless its base is all uppercase or has internal capitals),
+ *     lowercases others (unless all uppercase or internal capitals).
+ *   - Preserves proper nouns/brands with internal capitals.
  *   - Handles possessive suffixes correctly.
  * @param {string} text - The input text string.
  * @returns {string} - The sentence-cased string.
@@ -165,10 +167,17 @@ function sentenceCase(text) {
   const parsed = parseText(text);
   const words = parsed.words.map((word, idx) => {
     const { base, suffix } = splitBaseAndSuffix(word);
+
+    // Preserve all-uppercase words (acronyms, etc.)
     if (isAllUpperCase(base)) {
-      // Already all uppercase, return as-is (with suffix)
       return base + suffix;
     }
+
+    // Preserve words with internal capitals (proper names, brands)
+    if (/[A-Z]/.test(base.slice(1))) {
+      return base + suffix;
+    }
+
     if (idx === 0) {
       // Capitalize first letter of base, lowercase the rest; lowercase suffix
       return (
@@ -177,14 +186,8 @@ function sentenceCase(text) {
         suffix.toLowerCase()
       );
     }
-    // Preserve proper nouns: if word is already capitalized, keep it
-    if (
-      base.charAt(0) === base.charAt(0).toUpperCase() &&
-      base.slice(1) === base.slice(1).toLowerCase()
-    ) {
-      return base + suffix;
-    }
-    // Otherwise, lowercase base and suffix
+
+    // Lowercase base and suffix
     return base.toLowerCase() + suffix.toLowerCase();
   });
   return reassembleText({ words, separators: parsed.separators });
@@ -206,6 +209,10 @@ function startCase(text) {
       // Already all uppercase, return as-is (with suffix)
       return base + suffix;
     }
+    // Preserve words with internal capitals
+    if (/[A-Z]/.test(base.slice(1))) {
+      return base + suffix;
+    }
     // Capitalize first letter of base, lowercase the rest; lowercase suffix
     return (
       base.charAt(0).toUpperCase() +
@@ -218,12 +225,6 @@ function startCase(text) {
 
 // TITLE CASE CONVERSION /////////////////////////////////////////////////////////////////////////////
 
-/**
- * Converts a text string to title case following specific rules.
- * Handles ordinals, possessive suffixes, acronyms, and minor words correctly.
- * @param {string} text - The text to convert.
- * @returns {string} - The title-cased text.
- */
 function titleCase(text) {
   const parsed = parseText(text);
   const { words } = parsed;
@@ -233,13 +234,20 @@ function titleCase(text) {
     const word = words[i];
     const { base, suffix } = splitBaseAndSuffix(word);
 
-    // If base is all uppercase, preserve as-is (with suffix)
+    // 1. Preserve ALL-UPPERCASE words (acronyms, etc.)
     if (isAllUpperCase(base)) {
       result.push(base + suffix);
       continue;
     }
 
-    // If base starts with a digit (ordinal, etc.), preserve as-is (with suffix)
+    // 2. Preserve words with internal capitals (proper names, brands)
+    //    e.g. "iPhone", "DeLorean", "eBay", "DMC-12", "McDonald's"
+    if (/[A-Z]/.test(base.slice(1))) {
+      result.push(base + suffix);
+      continue;
+    }
+
+    // 3. Preserve words starting with a digit (ordinals, etc.)
     if (/^\d/.test(base)) {
       result.push(base + suffix);
       continue;
@@ -248,7 +256,7 @@ function titleCase(text) {
     const lowerBase = base.toLowerCase();
     const lowerSuffix = suffix.toLowerCase();
 
-    // Always capitalize first and last word
+    // 4. Always capitalize first and last word
     if (i === 0 || i === len - 1) {
       result.push(
         lowerBase.charAt(0).toUpperCase() +
@@ -258,13 +266,13 @@ function titleCase(text) {
       continue;
     }
 
-    // Capitalize "to" in infinitives: look for "to" followed by a verb (simplified: any word after "to")
+    // 5. Capitalize "to" in infinitives (optional rule)
     if (lowerBase === "to" && i + 1 < len) {
       result.push("To");
       continue;
     }
 
-    // Capitalize all words of 4+ letters (base only)
+    // 6. Capitalize all words of 4+ letters
     if (base.length >= 4) {
       result.push(
         lowerBase.charAt(0).toUpperCase() +
@@ -274,13 +282,13 @@ function titleCase(text) {
       continue;
     }
 
-    // Do not capitalize minor words (if 3 letters or fewer)
+    // 7. Do not capitalize minor words (if 3 letters or fewer)
     if (minorWords.has(lowerBase)) {
       result.push(lowerBase + lowerSuffix);
       continue;
     }
 
-    // Otherwise, capitalize principal words
+    // 8. Otherwise, capitalize principal words
     result.push(
       lowerBase.charAt(0).toUpperCase() +
       lowerBase.slice(1) +
@@ -295,17 +303,23 @@ function titleCase(text) {
 function camelCase(text) {
   const parsed = parseText(text);
   const words = parsed.words.map((word, idx) => {
-    // Remove possessive punctuation
     const base = removePossessive(word);
+    // If word has internal capitals, preserve as-is (except for first word)
+    if (/[A-Z]/.test(base.slice(1))) {
+      if (idx === 0) {
+        // Lowercase only the first letter, preserve the rest
+        return base.charAt(0).toLowerCase() + base.slice(1);
+      }
+      return base;
+    }
+    // Otherwise, standard camelCase logic
     if (idx === 0) {
-      // Lowercase the first word
       return base.toLowerCase();
     }
-    // Capitalize first letter, lowercase the rest
     return base.charAt(0).toUpperCase() + base.slice(1).toLowerCase();
   });
   // Reassemble with no separators
-  return reassembleText({ words, separators: Array(words.length + 1).fill('') });
+  return words.join('');
 }
 
 // SNAKE CASE CONVERSION & REASSEMBLY ////////////////////////////////////////////////////////////////
