@@ -15,12 +15,12 @@ Use context menu or shortcut to select desired case change:
 * Edge (soon)
 * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/)
 
-**Support**: Open an Issue to report a **bug** or make a **suggestion**.
+**Support**: Open a GitHub Issue to report a **bug** or make a **suggestion**.
 
 **Notes**:
 1. Undo (Ctrl+Z) can often be used to revert changes.
 2. Shortcuts can be set for case functions in the browser.
-3. All caps words (e.g., CIA) are changed only in camel & snake.
+3. All CAPS and embedded CAP words are preserved in sentence, start & title case.
 4. All words in AP style titles are capitalized except for certain short words, such as articles and short prepositions.
 
 **Privacy**: This extension does _not_ collect user information.

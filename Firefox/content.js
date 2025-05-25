@@ -7,7 +7,7 @@
 // SHIM FOR COMPATIBILITY WITH CHROME, WHICH USES `chrome` INSTEAD OF `browser` //////////////////
 window.browser = window.browser || window.chrome;
 
-// CONSTANTS /////////////////////////////////////////////////////////////////////////////////////
+// #region CONSTANTS AND HELPER FUNCTIONS ////////////////////////////////////////////////////////
 
 // Common articles, conjunctions, prepositions ≤3 letters
 const minorWords = new Set([
@@ -15,8 +15,6 @@ const minorWords = new Set([
   "and", "but", "for", "nor", "or", "so", "yet", // conjunctions
   "as", "at", "by", "in", "of", "off", "on", "per", "to", "up", "via" // prepositions
 ]);
-
-// HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////
 
 /**
  * Checks if a word is all uppercase (ignores non-letter characters).
@@ -52,13 +50,30 @@ function splitBaseAndSuffix(word) {
   };
 }
 
+/**
+ * Removes possessive suffixes from a word. 
+ * Handles both 's and ’s at the end.
+ * @param {string} word - The input word to process.  
+ * @return {string} - The word without possessive suffixes.
+ */
 function removePossessive(word) {
   // If ends with 's or ’s, remove the apostrophe and keep the s
   // If ends with just ' or ’, remove the apostrophe
   return word.replace(/(['’])s$/i, 's').replace(/(['’])$/i, '');
 }
 
-// FUNCTIONS TO PARSE AND REASSEMBLE TEXT ///////////////////////////////////////////////////////
+/**
+ * Checks if a string has internal capitals (e.g., "iPhone", "DeLorean"). 
+ * This means it has at least one uppercase letter after the first character.
+ * @param {string} str - The input string to check.     
+ * @return {boolean} - True if the string has internal capitals, false otherwise.
+ */
+function hasInternalCapitals(str) {
+  return /\p{Lu}/u.test(str.slice(1));
+}
+
+// #endregion // CONSTANTS AND HELPER FUNCTIONS ////////////////////////////////////////////////////////
+// #region FUNCTIONS TO PARSE AND REASSEMBLE TEXT ///////////////////////////////////////////////////////
 
 /**
  * Parses the input text into words and separators.
@@ -91,32 +106,16 @@ function reassembleText({ words, separators }) {
   return result;
 }
 
-// SIMPLE CASE CONVERSION FUNCTIONS ///////////////////////////////////////////////////////////////
+// #endregion // FUNCTIONS TO PARSE AND REASSEMBLE TEXT ////////////////////////////////////////////////////////
+// #region SIMPLE CASE CONVERSION FUNCTIONS ///////////////////////////////////////////////////////
 
 /**
- * Converts all words in the text to lowercase, unless the word is already all uppercase.
- * But if all letters in the selection are uppercase, convert the entire selection to lowercase.
+ * Converts all letters in the text to lowercase.
  * @param {string} text
  * @returns {string}
  */
 function lowerCase(text) {
-  if (isAllUpperCase(text)) {
-    // Edge case: all letters in the selection are uppercase
-    return text.toLowerCase();
-  }
-  // Converts all words in the text to lowercase, unless the word is already all uppercase
-  const parsed = parseText(text);
-  const words = parsed.words.map(word => {
-    const { base, suffix } = splitBaseAndSuffix(word);
-    if (isAllUpperCase(base)) {
-      // Preserve uppercase base, lowercase suffix
-      return base + suffix.toLowerCase();
-    } else {
-      // Lowercase entire word
-      return (base + suffix).toLowerCase();
-    }
-  });
-  return reassembleText({ words, separators: parsed.separators });
+  return text.toLowerCase();
 }
 
 /**
@@ -131,27 +130,22 @@ function upperCase(text) {
 }
 
 /**
- * Inverts the case of each letter in every word of the input text,
- * unless the base word is all uppercase. Handles possessive suffixes correctly.
+ * Inverts the case of each letter in the input text.
+ * Uppercase letters become lowercase and vice versa.
+ * Non-letter characters are unchanged.
  * @param {string} text
  * @returns {string}
  */
 function invertCase(text) {
-  const parsed = parseText(text);
-  const words = parsed.words.map(word => {
-    const { base, suffix } = splitBaseAndSuffix(word);
-    if (isAllUpperCase(base)) {
-      // Already all uppercase, return as-is (including suffix)
-      return base + suffix;
-    } else {
-      // Invert case of base and suffix separately, then join
-      const invert = s => Array.from(s).map(
-        c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()
-      ).join('');
-      return invert(base) + invert(suffix);
+  return Array.from(text).map(char => {
+    // Check if character is a letter
+    if (char === char.toUpperCase() && char !== char.toLowerCase()) {
+      return char.toLowerCase();
+    } else if (char === char.toLowerCase() && char !== char.toUpperCase()) {
+      return char.toUpperCase();
     }
-  });
-  return reassembleText({ words, separators: parsed.separators });
+    return char; // Non-letter characters unchanged
+  }).join('');
 }
 
 /**
@@ -174,7 +168,7 @@ function sentenceCase(text) {
     }
 
     // Preserve words with internal capitals (proper names, brands)
-    if (/[A-Z]/.test(base.slice(1))) {
+    if (hasInternalCapitals(base)) {
       return base + suffix;
     }
 
@@ -210,7 +204,7 @@ function startCase(text) {
       return base + suffix;
     }
     // Preserve words with internal capitals
-    if (/[A-Z]/.test(base.slice(1))) {
+    if (hasInternalCapitals(base)) {
       return base + suffix;
     }
     // Capitalize first letter of base, lowercase the rest; lowercase suffix
@@ -223,7 +217,8 @@ function startCase(text) {
   return reassembleText({ words, separators: parsed.separators });
 }
 
-// TITLE CASE CONVERSION /////////////////////////////////////////////////////////////////////////////
+// #endregion
+// #region TITLE CASE CONVERSION //////////////////////////////////////////////////////////////////
 
 function titleCase(text) {
   const parsed = parseText(text);
@@ -242,7 +237,7 @@ function titleCase(text) {
 
     // 2. Preserve words with internal capitals (proper names, brands)
     //    e.g. "iPhone", "DeLorean", "eBay", "DMC-12", "McDonald's"
-    if (/[A-Z]/.test(base.slice(1))) {
+    if (hasInternalCapitals(base)) {
       result.push(base + suffix);
       continue;
     }
@@ -298,31 +293,28 @@ function titleCase(text) {
   return reassembleText({ words: result, separators: parsed.separators });
 }
 
-// CAMELCASE CONVERSION //////////////////////////////////////////////////////////////////////////////
+// #endregion
+// #region CAMELCASE & SNAKE_CASE CONVERSION ////////////////////////////////////////////////////////////
 
+/**
+ * Converts text to standard camelCase.
+ * - First word is all lowercase.
+ * - Each subsequent word is capitalized (first letter uppercase, rest lowercase).
+ * - Internal capitals and acronyms are NOT preserved.
+ * - Possessive suffixes are removed.
+ * @param {string} text
+ * @returns {string}
+ */
 function camelCase(text) {
   const parsed = parseText(text);
-  const words = parsed.words.map((word, idx) => {
-    const base = removePossessive(word);
-    // If word has internal capitals, preserve as-is (except for first word)
-    if (/[A-Z]/.test(base.slice(1))) {
-      if (idx === 0) {
-        // Lowercase only the first letter, preserve the rest
-        return base.charAt(0).toLowerCase() + base.slice(1);
-      }
-      return base;
-    }
-    // Otherwise, standard camelCase logic
-    if (idx === 0) {
-      return base.toLowerCase();
-    }
-    return base.charAt(0).toUpperCase() + base.slice(1).toLowerCase();
-  });
-  // Reassemble with no separators
-  return words.join('');
+  return parsed.words
+    .map((word, idx) => {
+      const base = removePossessive(word).toLowerCase();
+      if (idx === 0) return base;
+      return base.charAt(0).toUpperCase() + base.slice(1);
+    })
+    .join('');
 }
-
-// SNAKE CASE CONVERSION & REASSEMBLY ////////////////////////////////////////////////////////////////
 
 function snakeCase(text) {
   const parsed = parseText(text);
@@ -336,7 +328,8 @@ function snakeCase(text) {
   return reassembleText(parsed);
 }
 
-// MESSAGING FROM BACKGROUND.JS TO SELECT FUNCTION ///////////////////////////////////////////////////
+// #endregion // CAMELCASE & SNAKE_CASE CONVERSION ////////////////////////////////////////////////////////////
+// #region MESSAGING FROM BACKGROUND.JS TO SELECT FUNCTION ///////////////////////////////////////////////////
 
 const caseFunctions = {
   lowerCase,
@@ -383,3 +376,4 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 });
+// #endregion // MESSAGING FROM BACKGROUND.JS TO SELECT FUNCTION ///////////////////////////////////////////////////
