@@ -1,7 +1,7 @@
 ﻿<!--
-POPUP.HTML of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
-REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
-© JOHN NAVAS 2025, ALL RIGHTS RESERVED
+  POPUP.HTML of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
+  REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
+  © JOHN NAVAS 2025, ALL RIGHTS RESERVED
 -->
 
 <!DOCTYPE html>
@@ -14,19 +14,47 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 24px auto;
-      max-width: 320px;
-      min-width: 220px;
-      padding: 16px;
-      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .popup-container {
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+      /*
+        Original max-width: 320px
+        First increase to: 380px (an increase of 60px)
+        Half of that prior increase (60px / 2 = 30px)
+        New max-width: 320px + 30px = 350px
+      */
+      max-width: 350px;
+      /*
+        Original min-width: 220px
+        First increase to: 280px (an increase of 60px)
+        Half of that prior increase (60px / 2 = 30px)
+        New min-width: 220px + 30px = 250px
+      */
+      min-width: 250px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+      /* Positioning: Near the top */
+      position: absolute;
+      top: 20px;
+      /* Positioned 20px from the top */
+      left: 50%;
+      transform: translateX(-50%);
+      /* Only translate horizontally to center */
     }
 
     h2 {
       font-size: 1.1em;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -36,14 +64,14 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 3px;
+      margin-top: 3px;
     }
 
     button {
       width: 100%;
-      max-width: 180px;
-      padding: 8px;
+      max-width: 145px;
+      padding: 6px;
       font-size: 1em;
       border-radius: 4px;
       border: medium solid #bbb;
@@ -62,15 +90,27 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
     .separator {
       width: 60%;
       border: none;
-      border-top: 1.5px solid #ccc;
+      border-top: 3px solid #ccc;
       margin: 0 0;
     }
 
-    /* Responsive styles */
+    #feedback {
+      text-align: center;
+      margin-top: 5px;
+      color: green;
+      min-height: 1.5em;
+      font-size: 1em;
+      font-weight: bold;
+      letter-spacing: 0.02em;
+      margin-bottom: 0;
+    }
+
+    /* Media queries for responsiveness on smaller screens */
     @media (max-width: 600px) {
-      body {
-        padding: 10px;
-        max-width: 100%;
+      .popup-container {
+        padding: 8px;
+        max-width: 90vw;
+        top: 15px;
       }
 
       h2 {
@@ -78,13 +118,12 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
       }
 
       button {
-        width: 100%;
         font-size: 1.1rem;
-        padding: 12px 0;
+        padding: 8px 0;
       }
 
       .button-group {
-        gap: 10px;
+        gap: 6px;
       }
 
       img[alt="icon"] {
@@ -108,20 +147,23 @@ REPLACES CONTEXT MENU ON DESKTOP WITH BUTTONS ON ANDROID
 </head>
 
 <body>
-  <h2>
-    <img alt="icon" height="32" src="images/icon-32.png" width="32">
-    Text Case Change to:
-  </h2>
-  <div class="button-group">
-    <button id="lowerCase">lower case</button>
-    <button id="upperCase">UPPER CASE</button>
-    <button id="invertCase">iNvErT cAsE</button>
-    <button id="sentenceCase">Sentence case.</button>
-    <button id="startCase">Start Case</button>
-    <button id="titleCase">Title Case</button>
-    <hr class="separator">
-    <button id="camelCase">camelCase</button>
-    <button id="snakeCase">snake_case</button>
+  <div class="popup-container">
+    <h2>
+      <img alt="icon" aria-label="Text Case Changer icon" height="32" src="images/icon-32.png" width="32">
+      Text Case Change to:
+    </h2>
+    <div class="button-group">
+      <button id="lowerCase">lower case</button>
+      <button id="upperCase">UPPER CASE</button>
+      <button id="invertCase">iNvErT cAsE</button>
+      <button id="sentenceCase">Sentence case.</button>
+      <button id="startCase">Start Case</button>
+      <button id="titleCase">Title Case</button>
+      <hr class="separator">
+      <button id="camelCase">camelCase</button>
+      <button id="snakeCase">snake_case</button>
+    </div>
+    <div id="feedback"></div>
   </div>
   <script src="popup.js"></script>
 </body>
