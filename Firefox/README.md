@@ -17,5 +17,6 @@ Use context menu or shortcut to select desired case change:
 2. Shortcuts can be set for case functions in the browser.
 3. All CAPS and embedded CAP words are preserved in sentence, start & title case.
 4. All words in AP style titles are capitalized except for certain short words, such as articles and short prepositions.
+5. On Android, popup replaces context menus.
 
 **PRIVACY**: This extension does _not_ collect user information.
