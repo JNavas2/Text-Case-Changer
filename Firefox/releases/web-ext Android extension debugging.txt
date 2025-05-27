@@ -1,0 +1,1 @@
+web-ext run -t firefox-android --android-device=47061FDAP00640 --firefox-apk org.mozilla.fenix --adb-remove-old-artifacts
