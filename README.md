@@ -12,7 +12,7 @@ Use context menu or shortcut to select desired case change:
 
 **Browsers**:
 * [Chrome](https://chromewebstore.google.com/detail/text-case-changer/aobkalbmldighbgdmnlofchhfhcncjnc?hl=en)
-* Edge (soon)
+* [Edge](https://microsoftedge.microsoft.com/addons/detail/text-case-changer/njhkkbpaioicefjkcpclknlkjlaobnke)
 * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/) (desktop & Android)
 
 **Support**: Open a GitHub Issue to report a **bug** or make a **suggestion**.
