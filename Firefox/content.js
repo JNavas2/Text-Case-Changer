@@ -162,9 +162,9 @@ function sentenceCase(text) {
   const words = parsed.words.map((word, idx) => {
     const { base, suffix } = splitBaseAndSuffix(word);
 
-    // Preserve all-uppercase words (acronyms, etc.)
+    // Preserve all-uppercase words (acronyms, etc.), but lowercase suffix
     if (isAllUpperCase(base)) {
-      return base + suffix;
+      return base + suffix.toLowerCase();
     }
 
     // Preserve words with internal capitals (proper names, brands)
@@ -200,8 +200,8 @@ function startCase(text) {
   const words = parsed.words.map(word => {
     const { base, suffix } = splitBaseAndSuffix(word);
     if (isAllUpperCase(base)) {
-      // Already all uppercase, return as-is (with suffix)
-      return base + suffix;
+      // Already all uppercase, return as-is (with lowercased suffix)
+      return base + suffix.toLowerCase();
     }
     // Preserve words with internal capitals
     if (hasInternalCapitals(base)) {
@@ -229,9 +229,9 @@ function titleCase(text) {
     const word = words[i];
     const { base, suffix } = splitBaseAndSuffix(word);
 
-    // 1. Preserve ALL-UPPERCASE words (acronyms, etc.)
+    // 1. Preserve ALL-UPPERCASE words (acronyms, etc.), but lowercase suffix
     if (isAllUpperCase(base)) {
-      result.push(base + suffix);
+      result.push(base + suffix.toLowerCase());
       continue;
     }
 
