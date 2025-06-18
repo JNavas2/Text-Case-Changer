@@ -49,6 +49,11 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
 			font-size: x-large;
 		}
 
+		.whatsnew-label {
+			color: #0000ff;
+			font-weight: bold;
+		}
+
 		/* Responsive styles */
 		@media (max-width: 600px) {
 			body {
@@ -112,7 +117,10 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for MOZILLA FIREFOX
 		<li>camelCase</li>
 		<li>snake_case </li>
 	</ul>
-	<p>NOTES:</p>
+	<p>
+		<span class="whatsnew-label">WHAT'S NEW</span> in <span id="whatsNewVersion">{version}</span>: <span id="whatsNewChanges">{changes}</span>
+	</p>
+	<p><b>NOTES:</b></p>
 	<ol>
 		<li>Undo (Ctrl+Z) can often be used to revert changes.</li>
 		<li>Shortcuts can be set for case functions in the browser.</li>
