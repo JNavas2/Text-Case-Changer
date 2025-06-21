@@ -16,6 +16,7 @@ Use context menu or shortcut to select desired case change:
 * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/) (desktop & Android)
 
 **Support**: Open a GitHub Issue to report a **bug** or make a **suggestion**.
+* Firefox is not supported (due to Mozilla policies).
 
 **Notes**:
 1. Undo (Ctrl+Z) can often be used to revert changes.
