@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Text Case Changer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Change Case of selected editable text.",
   "homepage_url": "https://github.com/JNavas2/Text-Case-Changer",
   "icons": {
@@ -32,7 +32,7 @@
   ],
   "browser_action": {
     "default_icon": "images/icon-32.png",
-    "default_title": "Change Text Case",
+    "default_title": "Text Case Change …",
     "default_popup": "popup.html"
   },
   "commands": {
