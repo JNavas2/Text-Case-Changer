@@ -1,5 +1,6 @@
 # Welcome to Text Case Changer
-Browser extension to quickly change the case of selected editable text.   
+Browser extension to quickly change the case of selected editable text.  
+(<b>One-time permission approval</b> is now required to work around a browser regression.)  
 Use context menu or shortcut to select desired case change:
 * lower case
 * UPPER CASE
