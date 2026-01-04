@@ -1,8 +1,4 @@
-﻿<!--
-ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
-© JOHN NAVAS 2025, ALL RIGHTS RESERVED
- -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -30,17 +26,40 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 			gap: 10px;
 		}
 
+		/* Button layout and distribution */
+		.button-group {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 20px;
+			gap: 12px;
+		}
+
 		button {
-			background-color: #e74c3c;
+			flex: 1;
 			color: white;
 			border: none;
-			padding: 8px 12px;
+			padding: 10px;
 			font-size: 1rem;
 			cursor: pointer;
 			border-radius: 4px;
+			font-weight: bold;
 		}
 
-		button:hover {
+		#closeBtn {
+			background-color: #95a5a6;
+			/* Neutral grey for close */
+		}
+
+		#closeBtn:hover {
+			background-color: #7f8c8d;
+		}
+
+		#removeBtn {
+			background-color: #e74c3c;
+			/* Red for remove */
+		}
+
+		#removeBtn:hover {
 			background-color: #c0392b;
 		}
 
@@ -59,9 +78,13 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 				font-size: 1.3rem;
 			}
 
+			.button-group {
+				flex-direction: column;
+				/* Stack on mobile */
+			}
+
 			button {
 				width: 100%;
-				font-size: 1.1rem;
 				padding: 12px 0;
 			}
 
@@ -72,18 +95,6 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 			img[alt=Icon] {
 				height: 28px;
 				width: 28px;
-			}
-		}
-
-		@media (max-width: 400px) {
-			h1 {
-				font-size: 1rem;
-				flex-direction: column;
-				gap: 4px;
-			}
-
-			button {
-				font-size: 1rem;
 			}
 		}
 
@@ -99,8 +110,10 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 		<img alt="Icon" height="32" src="images/icon-32.png" width="32"> Welcome to Text
 		Case Changer
 	</h1>
-	<p>Extension to change the case of selected editable text.<br>Use context menu or
-		shortcut to select desired change:</p>
+	<p>Extension to change the case of selected editable text.<br>
+		(<b>One-time permission approval</b> is now required to work around a browser regression.)<br>
+		Use context menu or shortcut to select desired change:
+	</p>
 	<ul>
 		<li>lower case</li>
 		<li>UPPER CASE</li>
@@ -111,17 +124,22 @@ ONBOARDING.HTML of TEXT CASE CHANGER, an EXTENSION for CHROME
 		<li>camelCase</li>
 		<li>snake_case </li>
 	</ul>
-	<p>NOTES:</p>
+	<h4>Notes:</h4>
 	<ol>
 		<li>Undo (Ctrl+Z) can often be used to revert changes.</li>
 		<li>Shortcuts can be set for case functions in the browser.</li>
 		<li>All CAPS and embedded CAP words are preserved in sentence, start & title case.</li>
-		<li>All words in AP style titles are capitalized except for certain<br>short
+		<li>All words in AP style titles are capitalized except for certain short
 			words, such as articles and short prepositions.</li>
-		<li>Refresh any open tabs to enable this extension in them. </li>
+		<li>Refresh any open tabs to enable this extension in them.</li>
 	</ol>
 	<p><strong>PRIVACY:</strong> This extension does <em>not</em> collect user information.</p>
-	<button id="removeBtn">Remove Extension</button>
+
+	<div class="button-group">
+		<button id="closeBtn">Close</button>
+		<button id="removeBtn">Remove Extension</button>
+	</div>
+
 	<script src="onboarding.js"></script>
 
 </body>
