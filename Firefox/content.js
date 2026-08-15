@@ -17,6 +17,15 @@ const minorWords = new Set([
 ]);
 
 /**
+ * Checks if the entire text contains lowercase letters.
+ * @param {string} text - The input string to check.
+ * @returns {boolean} - False if there are NO lowercase letters, True otherwise.
+ */
+function hasLowerCase(text) {
+  return /\p{Ll}/u.test(text);
+}
+
+/**
  * Checks if a word is all uppercase (ignores non-letter characters).
  * @param {string} word
  * @returns {boolean}
@@ -158,18 +167,23 @@ function invertCase(text) {
  * @returns {string} - The sentence-cased string.
  */
 function sentenceCase(text) {
+  const hasLower = hasLowerCase(text); // preservation if at least one lowercase character 
   const parsed = parseText(text);
   const words = parsed.words.map((word, idx) => {
     const { base, suffix } = splitBaseAndSuffix(word);
 
-    // Preserve all-uppercase words (acronyms, etc.), but lowercase suffix
-    if (isAllUpperCase(base)) {
-      return base + suffix.toLowerCase();
-    }
+    if (hasLower) {  // preservation only if at least one lowercase character
 
-    // Preserve words with internal capitals (proper names, brands)
-    if (hasInternalCapitals(base)) {
-      return base + suffix;
+      // Preserve all-uppercase words (acronyms, etc.), but lowercase suffix
+      if (isAllUpperCase(base)) {
+        return base + suffix.toLowerCase();
+      }
+
+      // Preserve words with internal capitals (proper names, brands)
+      if (hasInternalCapitals(base)) {
+        return base + suffix;
+      }
+
     }
 
     if (idx === 0) {
@@ -196,17 +210,25 @@ function sentenceCase(text) {
  * @returns {string} - The start-cased string.
  */
 function startCase(text) {
+  const hasLower = hasLowerCase(text); // preservation if at least one lowercase character 
   const parsed = parseText(text);
   const words = parsed.words.map(word => {
     const { base, suffix } = splitBaseAndSuffix(word);
-    if (isAllUpperCase(base)) {
-      // Already all uppercase, return as-is (with lowercased suffix)
-      return base + suffix.toLowerCase();
+
+    if (hasLower) {  // preservation only if at least one lowercase character
+
+      if (isAllUpperCase(base)) {
+        // Already all uppercase, return as-is (with lowercased suffix)
+        return base + suffix.toLowerCase();
+      }
+
+      // Preserve words with internal capitals
+      if (hasInternalCapitals(base)) {
+        return base + suffix;
+      }
+
     }
-    // Preserve words with internal capitals
-    if (hasInternalCapitals(base)) {
-      return base + suffix;
-    }
+
     // Capitalize first letter of base, lowercase the rest; lowercase suffix
     return (
       base.charAt(0).toUpperCase() +
@@ -221,6 +243,7 @@ function startCase(text) {
 // #region TITLE CASE CONVERSION //////////////////////////////////////////////////////////////////
 
 function titleCase(text) {
+  const hasLower = hasLowerCase(text); // preservation if at least one lowercase character
   const parsed = parseText(text);
   const { words } = parsed;
   const len = words.length;
@@ -229,23 +252,27 @@ function titleCase(text) {
     const word = words[i];
     const { base, suffix } = splitBaseAndSuffix(word);
 
-    // 1. Preserve ALL-UPPERCASE words (acronyms, etc.), but lowercase suffix
-    if (isAllUpperCase(base)) {
-      result.push(base + suffix.toLowerCase());
-      continue;
-    }
+    if (hasLower) {  // preservation only if at least one lowercase character
 
-    // 2. Preserve words with internal capitals (proper names, brands)
-    //    e.g. "iPhone", "DeLorean", "eBay", "DMC-12", "McDonald's"
-    if (hasInternalCapitals(base)) {
-      result.push(base + suffix);
-      continue;
-    }
+      // 1. Preserve ALL-UPPERCASE words (acronyms, etc.), but lowercase suffix
+      if (isAllUpperCase(base)) {
+        result.push(base + suffix.toLowerCase());
+        continue;
+      }
 
-    // 3. Preserve words starting with a digit (ordinals, etc.)
-    if (/^\d/.test(base)) {
-      result.push(base + suffix);
-      continue;
+      // 2. Preserve words with internal capitals (proper names, brands)
+      //    e.g. "iPhone", "DeLorean", "eBay", "DMC-12", "McDonald's"
+      if (hasInternalCapitals(base)) {
+        result.push(base + suffix);
+        continue;
+      }
+
+      // 3. Preserve words starting with a digit (ordinals, etc.)
+      if (/^\d/.test(base)) {
+        result.push(base + suffix);
+        continue;
+      }
+
     }
 
     const lowerBase = base.toLowerCase();
@@ -262,10 +289,7 @@ function titleCase(text) {
     }
 
     // 5. Capitalize "to" in infinitives (optional rule)
-    if (lowerBase === "to" && i + 1 < len) {
-      result.push("To");
-      continue;
-    }
+    // *** REMOVED FOR CMOS/AP COMPLIANCE ***
 
     // 6. Capitalize all words of 4+ letters
     if (base.length >= 4) {

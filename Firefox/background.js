@@ -4,13 +4,30 @@
  * © JOHN NAVAS 2025, ALL RIGHTS RESERVED
  */
 
-// 1. Onboarding Page (always run)
+// 1. Onboarding Page (always run except on patch updates)
 browser.runtime.onInstalled.addListener((details) => {
   console.log("[background] onInstalled:", details);
+  
   if (details.reason === "install" || details.reason === "update") {
-    const url = browser.runtime.getURL("onboarding.html");
-    console.log("[background] Opening onboarding page:", url);
-    browser.tabs.create({ url });
+    let isPatchOnly = false;
+
+    if (details.reason === "update" && details.previousVersion) {
+      const currentVersion = browser.runtime.getManifest().version;
+      const prevParts = details.previousVersion.split(".");
+      const currParts = currentVersion.split(".");
+
+      // If Major (index 0) and Minor (index 1) are exactly the same, it is only a patch.
+      if (prevParts[0] === currParts[0] && prevParts[1] === currParts[1]) {
+        isPatchOnly = true;
+      }
+    }
+
+    // ALWAYS show Welcome EXCEPT when the change is only patch
+    if (!isPatchOnly) {
+      const url = browser.runtime.getURL("onboarding.html");
+      console.log("[background] Opening onboarding page:", url);
+      browser.tabs.create({ url });
+    }
   }
 });
 

@@ -23,20 +23,50 @@ function createContextMenus() {
   chrome.contextMenus.create({ id: "text-case-changer-edit-shortcuts", parentId: "text-case-changer", title: "Edit Shortcuts", contexts: ["selection", "editable"] });
 }
 
-// THE GATEKEEPER: Consolidated permission check
-async function checkAccessAndSend(tabId, message) {
-  const hasAccess = await chrome.permissions.contains({ origins: ["<all_urls>"] });
-  if (!hasAccess) {
-    chrome.tabs.create({ url: chrome.runtime.getURL("request.html") });
-    return;
+// Programmatically injects content.js via activeTab without needing content.js structural changes
+async function injectAndSendMessage(tabId, caseType) {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      func: () => typeof window.textCaseChangerInitialized !== 'undefined'
+    });
+
+    if (!result || !result.result) {
+      await chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: () => { window.textCaseChangerInitialized = true; }
+      });
+      await chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ["content.js"]
+      });
+    }
+
+    chrome.tabs.sendMessage(tabId, { action: "changeCase", caseType: caseType });
+  } catch (err) {
+    console.error("[service_worker] Injection or message failed:", err);
   }
-  chrome.tabs.sendMessage(tabId, message);
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install" || details.reason === "update") {
-    chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+    let isPatchOnly = false;
+
+    if (details.reason === "update" && details.previousVersion) {
+      const currentVersion = chrome.runtime.getManifest().version;
+      const prevParts = details.previousVersion.split(".");
+      const currParts = currentVersion.split(".");
+
+      if (prevParts[0] === currParts[0] && prevParts[1] === currParts[1]) {
+        isPatchOnly = true;
+      }
+    }
+
+    if (!isPatchOnly) {
+      chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+    }
   }
+
   chrome.contextMenus.removeAll(() => createContextMenus());
 });
 
@@ -50,7 +80,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
   if (info.menuItemId.startsWith(prefix)) {
     const caseType = info.menuItemId.replace(prefix, "");
-    if (tab && tab.id) checkAccessAndSend(tab.id, { action: "changeCase", caseType: caseType });
+    if (tab && tab.id) {
+      injectAndSendMessage(tab.id, caseType);
+    }
   }
 });
 
@@ -58,7 +90,9 @@ chrome.commands.onCommand.addListener((command) => {
   const validCases = ["lowerCase", "upperCase", "invertCase", "sentenceCase", "startCase", "titleCase", "camelCase", "snakeCase"];
   if (validCases.includes(command)) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0] && tabs[0].id) checkAccessAndSend(tabs[0].id, { action: "changeCase", caseType: command });
+      if (tabs[0] && tabs[0].id) {
+        injectAndSendMessage(tabs[0].id, command);
+      }
     });
   }
 });
