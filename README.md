@@ -21,7 +21,7 @@ Use context menu or shortcut to select desired case change:
 **Notes**:
 1. Undo (Ctrl+Z) can often be used to revert changes.
 2. Keyboard Shortcuts can be set for case functions in the browser.
-3. All CAPS and embedded CAP words (e.g., acronyms, brands) are preserved in Sentence, Start & Title Case.
+3. All CAPS and embedded CAP words are preserved in Sentence, Start & Title Case, *unless entire input has* no *lowercase*.
 4. All words in AP style titles are capitalized except for certain short words, such as articles and short prepositions.
 5. Lower Case can be used to force _all_ letters to lower case (_not_ preserving acronyms or brands).
 
