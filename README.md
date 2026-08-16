@@ -11,14 +11,16 @@ Use context menu or shortcut to select desired case change:
 * camelCase
 * snake_case
 
-**Browsers**:
+**Browsers**
 * [Chrome](https://chromewebstore.google.com/detail/text-case-changer/aobkalbmldighbgdmnlofchhfhcncjnc?hl=en)
 * [Edge](https://microsoftedge.microsoft.com/addons/detail/text-case-changer/njhkkbpaioicefjkcpclknlkjlaobnke)
 * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/text-case-changer/) (desktop & Android)
 
-**Support**: Open a GitHub Issue to report a **bug** or make a **suggestion**.
+**Support**
+* Bug. Open a [new Issue](https://github.com/JNavas2/Text-Case-Changer/issues).
+* Suggestion. Open a [new Discussion](https://github.com/JNavas2/Text-Case-Changer/discussions).
 
-**Notes**:
+**Notes**
 1. Undo (Ctrl+Z) can often be used to revert changes.
 2. Keyboard Shortcuts can be set for case functions in the browser.
 3. All CAPS and embedded CAP words are preserved in Sentence, Start & Title Case, *unless entire input has* no *lowercase*.
