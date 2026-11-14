@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            width: 140px;
+            margin: 0;
+            padding: 4px 0;
+            font-family: Arial, sans-serif;
+            cursor: default;
+            background-color: #fff;
+        }
+        .item {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #000;
+            transition: background-color 0.1s;
+            cursor: pointer;
+        }
+        .item:hover {
+            background-color: #eeeeee;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #cccccc;
+            margin: 4px 0;
+        }
+        /* --- Mobile Android only (Zero effect on Desktop) --- */
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                width: 260px;
+                max-width: 88vw;
+                margin: 15px auto;
+                padding: 15px;
+                border: 1.5px solid #333333;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                box-sizing: border-box;
+            }
+            .item {
+                display: block;
+                text-align: center;
+                font-weight: bold;
+                font-size: 15px;
+                padding: 12px;
+                border: 1.5px solid #222222;
+                border-radius: 6px;
+                background-color: #ededed;
+                margin-bottom: 8px;
+            }
+            .item:active {
+                background-color: #dcdcdc;
+            }
+            hr {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="item" data-case="lowerCase">lower case</div>
+    <div class="item" data-case="upperCase">UPPER CASE</div>
+    <div class="item" data-case="invertCase">Invert cASE</div>
+    <div class="item" data-case="sentenceCase">Sentence Case.</div>
+    <div class="item" data-case="startCase">Start Case</div>
+    <div class="item" data-case="titleCase">Title Case</div>
+    <hr>
+    <div class="item" data-case="camelCase">camelCase</div>
+    <div class="item" data-case="snakeCase">snake_case</div>
+    <script src="popup.js"></script>
+</body>
+</html>
